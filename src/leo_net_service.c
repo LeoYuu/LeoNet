@@ -1,5 +1,12 @@
 #include "leo_net_service.h"
 
+struct net_rw_event {
+  struct event* ev_read;
+  struct event* ev_write;
+};
+
+static struct net_rw_event net_events[65535] = { 0 };
+
 evutil_socket_t
 net_socket_open() {
   return socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -37,11 +44,7 @@ net_socket_nonblocking(evutil_socket_t fd) {
 
 int
 net_socket_reuseaddr(evutil_socket_t fd) {
-  int flag = 1;
-  if(-1 == setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char*)&flag, sizeof(int))) {
-    return 0;
-  }
-  return 1;
+  return evutil_make_listen_socket_reuseable(fd);
 }
 
 int
@@ -65,38 +68,46 @@ net_service_release(struct event_base* eb) {
 
 void
 net_service_accept(evutil_socket_t listen_fd, short events, void* args) {
+  int slen;
+  evutil_socket_t fd;
+  struct net_rw_event* ne;
+  struct service_init* si;
   struct sockaddr_storage ss;
-  int slen = sizeof(ss);
-  struct event *ev_read, *ev_write;
-  struct service_init* si = (struct service_init*)args;
 
-  evutil_socket_t fd = accept(listen_fd, (struct sockaddr*)&ss, &slen);
+  slen = sizeof(ss);
+  si = (struct service_init*)args;
+
+  fd = accept(listen_fd, (struct sockaddr*)&ss, &slen);
   if(fd < 0) {
     return;
   }
 
   net_socket_nonblocking(fd);
 
-  ev_read = net_event_create(si->eb, fd, EV_READ | EV_PERSIST, net_service_read, args);
-  if(!ev_read) {
-    return;
+  ne = (struct net_rw_event*)malloc(sizeof(struct net_rw_event));
+  if(ne) {
+    ne->ev_read = net_event_create(si->eb, fd, EV_READ | EV_PERSIST, net_service_read, args);
+    ne->ev_write = net_event_create(si->eb, fd, EV_WRITE, net_service_write, args);
+
+    if(!ne->ev_read || !ne->ev_write) {
+      ne->ev_read ? free(ne->ev_read) : 0;
+      ne->ev_write ? free(ne->ev_write) : 0;
+      free(ne);
+      ne = 0;
+    }
   }
 
-  ev_write = net_event_create(si->eb, fd, EV_WRITE | EV_PERSIST, net_service_write, args);
-  if(!ev_write) {
-    net_event_release(ev_read);
-    return;
-  }
-
-  event_add(ev_read, NULL);
-  event_add(ev_write, NULL);
+  event_add(ne->ev_read, NULL);
+  event_add(ne->ev_write, NULL);
 
   si->ui.__accept_cb(fd, (struct sockaddr_in*)&ss, NULL);
 }
 
 void
 net_service_read(evutil_socket_t fd, short events, void* args) {
-  struct service_init* si = (struct service_init*)args;
+  struct service_init* si;
+
+  si = (struct service_init*)args;
 
   si->ui.__read_cb(fd, NULL);
 }
@@ -104,15 +115,17 @@ net_service_read(evutil_socket_t fd, short events, void* args) {
 void
 net_service_write(evutil_socket_t fd, short events, void* args) {
   int result;
-  struct service_init* si = (struct service_init*)args;
+  struct service_init* si;
 
-  result = si->ui.__write_cb(fd, NULL);
+  si = (struct service_init*)args;
+  
+  /*result = si->ui.__write_cb(fd, NULL);
 
   if(0 == result) {
     
   } else if(result < 0) {
 
-  }
+  }*/
 }
 
 struct event*

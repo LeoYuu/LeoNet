@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <WinSock2.h>
 
-
 #include "util.h"
 #include "leo_net_service.h"
 
@@ -10,16 +9,23 @@
 
 void
 on_accept(evutil_socket_t fd, struct sockaddr_in* sin, void* args) {
-  const char* client_ip;
+  const char* connection_ip;
   struct service_init* si;
 
-  client_ip = inet_ntoa(sin->sin_addr);
-  printf("accept client[socket:%d][ip:%s][port:%d].\n", fd, client_ip, sin->sin_port);
+  connection_ip = inet_ntoa(sin->sin_addr);
+  printf("accept connection[socket:%d][ip:%s][port:%d].\n", fd, connection_ip, sin->sin_port);
 }
 
 void
 on_read(evutil_socket_t fd, void* args) {
+  int len;
+  char recv_buffer[256];
+  memset(recv_buffer, 0, sizeof(recv_buffer));
 
+  len = recv(fd, recv_buffer, sizeof(recv_buffer), 0);
+  if(len > 0) {
+    printf("%s", recv_buffer);
+  }
 }
 
 void

@@ -12,7 +12,7 @@ typedef void(* read_cb)(evutil_socket_t, void*);
 typedef void(* write_cb)(evutil_socket_t, void*);
 typedef void(* event_cb)(evutil_socket_t, short, void*);
 
-struct user_init{
+struct user_init {
   read_cb __read_cb;
   write_cb __write_cb;
   accept_cb __accept_cb;
