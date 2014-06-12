@@ -186,6 +186,14 @@
 		<Filter
 			Name="net_session"
 			>
+			<File
+				RelativePath="..\..\src\leo_net_session.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\leo_net_session.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="ring_buffer"

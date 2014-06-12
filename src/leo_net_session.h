@@ -1,6 +1,8 @@
 #ifndef __LEO_NET_SESSION_H__
 #define __LEO_NET_SESSION_H__
 
+#include <map>
+#include <vector>
 #include "ring_buffer.h"
 
 class net_session
@@ -11,6 +13,8 @@ public:
 
 public:
   void init();
+  void send_data(char* buf, int len);
+  void recv_data(char* buf, int len);
 
 public:
   inline void set_socket(int fd)

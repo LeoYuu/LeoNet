@@ -1,5 +1,34 @@
 #include "leo_net_session.h"
 
+net_session::net_session()
+: __socket(0)
+, __session_id(0)
+{
+  __read_buffer.clear();
+  __write_buffer.clear();
+}
+
+net_session::~net_session()
+{
+  __read_buffer.clear();
+  __write_buffer.clear();
+};
+
+void net_session::init()
+{
+
+}
+
+void net_session::send_data(char* buf, int len)
+{
+  __write_buffer.kfifo_put(buf, len);
+}
+
+void net_session::recv_data(char* buf, int len)
+{
+  __read_buffer.kfifo_put(buf, len);
+}
+
 session_manager::session_manager()
 : __session_id(0)
 , __malloc_session(NULL)

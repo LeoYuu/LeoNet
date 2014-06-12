@@ -1,4 +1,3 @@
-#include "ring_buffer.h"
 #include "leo_net_service.h"
 
 struct net_rw_event {
@@ -40,12 +39,24 @@ net_socket_listen(evutil_socket_t fd, int backlog) {
 
 int
 net_socket_recv(evutil_socket_t fd, char* buf, int len) {
-  
+  int n = 0;
+#ifdef _WIN32
+  n = recv(fd, buf, len, 0);
+#else
+  n = read(fd, buf, len);
+#endif
+  return n;
 }
 
 int
 net_socket_send(evutil_socket_t fd, char* buf, int len) {
-  
+  int n = 0;
+#ifdef _WIN32
+  n = send(fd, buf, len, 0);
+#else
+  n = write(fd, buf, len);
+#endif
+  return n;
 }
 
 int
