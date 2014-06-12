@@ -1,3 +1,4 @@
+#include "ring_buffer.h"
 #include "leo_net_service.h"
 
 struct net_rw_event {
@@ -35,6 +36,16 @@ net_socket_bind(evutil_socket_t fd, short port) {
 int
 net_socket_listen(evutil_socket_t fd, int backlog) {
   return listen(fd, backlog);
+}
+
+int
+net_socket_recv(evutil_socket_t fd, char* buf, int len) {
+  
+}
+
+int
+net_socket_send(evutil_socket_t fd, char* buf, int len) {
+  
 }
 
 int
