@@ -141,13 +141,7 @@ net_service_write(evutil_socket_t fd, short events, void* args) {
 
   si = (struct service_init*)args;
   
-  /*result = si->ui.__write_cb(fd, NULL);
-
-  if(0 == result) {
-    
-  } else if(result < 0) {
-
-  }*/
+  si->ui.__write_cb(fd, NULL);
 }
 
 struct event*

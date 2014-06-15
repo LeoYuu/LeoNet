@@ -198,7 +198,19 @@
 		<Filter
 			Name="ring_buffer"
 			>
+			<File
+				RelativePath="..\..\src\ring_buffer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ring_buffer.h"
+				>
+			</File>
 		</Filter>
+		<File
+			RelativePath="..\..\src\leo_singleton.h"
+			>
+		</File>
 		<File
 			RelativePath="..\..\src\main.c"
 			>

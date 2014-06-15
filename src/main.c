@@ -3,6 +3,7 @@
 
 #include "util.h"
 #include "leo_net_service.h"
+#include "leo_net_session.h"
 
 #define PORT 6000
 #define BACKLOG 100
@@ -11,20 +12,28 @@ void
 on_accept(evutil_socket_t fd, struct sockaddr_in* sin, void* args) {
   const char* connection_ip;
   struct service_init* si;
+  net_session* session;
 
   connection_ip = inet_ntoa(sin->sin_addr);
   printf("accept connection[socket:%d][ip:%s][port:%d].\n", fd, connection_ip, sin->sin_port);
+
+  session = session_manager::instance()->claim_one_session();
+  if(session) {
+    session_manager::instance()->insert_session(fd, session);
+  } else {
+    printf("%s : can't find one free session\n", __FUNCTION__);
+    return;
+  }
 }
 
 void
 on_read(evutil_socket_t fd, void* args) {
-  int len;
-  char recv_buffer[256];
-  memset(recv_buffer, 0, sizeof(recv_buffer));
+  net_session* session;
+  session = session_manager::instance()->get_one_session(fd);
+  if(session) {
+    
+  } else {
 
-  len = recv(fd, recv_buffer, sizeof(recv_buffer), 0);
-  if(len > 0) {
-    printf("%s", recv_buffer);
   }
 }
 

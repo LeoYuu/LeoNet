@@ -40,7 +40,6 @@ public:
 private:
   int __socket;
   int __session_id;
-
   ring_buffer __read_buffer;
   ring_buffer __write_buffer;
 };
@@ -50,7 +49,7 @@ private:
 typedef vector<net_session*> VCTSESSION;
 typedef map<int, net_session*> MAPSESSION;
 
-class session_manager
+class session_manager : public leo_singleton<session_manager>
 {
 public:
   session_manager();
