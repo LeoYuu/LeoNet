@@ -3,7 +3,12 @@
 
 #include <map>
 #include <vector>
+
 #include "ring_buffer.h"
+#include "leo_singleton.h"
+
+#define MAX_SESSION 2000
+#define MAX_BUFFER_LEN 4096
 
 class net_session
 {
@@ -13,8 +18,12 @@ public:
 
 public:
   void init();
-  void send_data(char* buf, int len);
-  void recv_data(char* buf, int len);
+
+public:
+  int push_to_readbuffer(char* buf, int len);
+  int fetch_from_readbuffer(char* buf, int len);
+  int push_to_writebuffer(char* buf, int len);
+  int fetch_from_writebuffer(char* buf, int len);
 
 public:
   inline void set_socket(int fd)
@@ -44,10 +53,8 @@ private:
   ring_buffer __write_buffer;
 };
 
-#define MAX_SESSION 2000
-
-typedef vector<net_session*> VCTSESSION;
-typedef map<int, net_session*> MAPSESSION;
+typedef std::vector<net_session*> VCTSESSION;
+typedef std::map<int, net_session*> MAPSESSION;
 
 class session_manager : public leo_singleton<session_manager>
 {
@@ -62,15 +69,14 @@ public:
   net_session* claim_one_session();
   void reclaim_one_session(net_session* session);
 
-  BOOL insert_session(int socket, net_session* session);
-  void remove_session(int socket);
   net_session* get_one_session(int socket);
+  BOOL insert_session(int socket, net_session* session);
+  BOOL remove_session(int socket);
 
 private:
   int __session_id;
   VCTSESSION __vct_sessions;
   MAPSESSION __map_sessions;
-
   net_session* __malloc_session;
 };
 

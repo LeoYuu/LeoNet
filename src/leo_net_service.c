@@ -136,7 +136,6 @@ net_service_read(evutil_socket_t fd, short events, void* args) {
 
 void
 net_service_write(evutil_socket_t fd, short events, void* args) {
-  int result;
   struct service_init* si;
 
   si = (struct service_init*)args;

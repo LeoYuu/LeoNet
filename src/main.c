@@ -28,18 +28,43 @@ on_accept(evutil_socket_t fd, struct sockaddr_in* sin, void* args) {
 
 void
 on_read(evutil_socket_t fd, void* args) {
+  int len;
+  char buf[MAX_BUFFER_LEN];
   net_session* session;
+
   session = session_manager::instance()->get_one_session(fd);
   if(session) {
-    
-  } else {
+    len = net_socket_recv(fd, buf, sizeof(buf));
+    if(len > 0) {
+      session->push_to_readbuffer(buf, len);
+    } else {
 
+    }
+  } else {
+    printf("%s : can't find the session[fd:%d]!", __FUNCTION__, fd);
+    return;
   }
 }
 
 void
 on_write(evutil_socket_t fd, void* args) {
+  int len;
+  char buf[MAX_BUFFER_LEN];
+  net_session* session;
 
+  session = session_manager::instance()->get_one_session(fd);
+  if(session) {
+    len = session->fetch_from_writebuffer(buf, sizeof(len));
+    len = net_socket_send(fd, buf, len);
+    if(len > 0) {
+      
+    } else {
+
+    }
+  } else {
+    printf("%s : can't find the session[fd:%d]!", __FUNCTION__, fd);
+    return;
+  }
 }
 
 int

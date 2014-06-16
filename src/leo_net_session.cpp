@@ -3,9 +3,10 @@
 net_session::net_session()
 : __socket(0)
 , __session_id(0)
+, __read_buffer(MAX_BUFFER_LEN)
+, __write_buffer(MAX_BUFFER_LEN)
 {
-  __read_buffer.clear();
-  __write_buffer.clear();
+
 }
 
 net_session::~net_session()
@@ -19,14 +20,24 @@ void net_session::init()
 
 }
 
-void net_session::send_data(char* buf, int len)
+int net_session::push_to_readbuffer(char* buf, int len)
 {
-  __write_buffer.kfifo_put(buf, len);
+  return __read_buffer.kfifo_put(buf, len);
 }
 
-void net_session::recv_data(char* buf, int len)
+int net_session::fetch_from_readbuffer(char* buf, int len)
 {
-  __read_buffer.kfifo_put(buf, len);
+  return __read_buffer.kfifo_get(buf, len);
+}
+
+int net_session::push_to_writebuffer(char* buf, int len)
+{
+  return __write_buffer.kfifo_put(buf, len);
+}
+
+int net_session::fetch_from_writebuffer(char* buf, int len)
+{
+  return __write_buffer.kfifo_get(buf, len);
 }
 
 session_manager::session_manager()
@@ -44,7 +55,7 @@ session_manager::~session_manager()
   __vct_sessions.clear();
 
   delete[] __malloc_session;
-  __malloc_session = NULL:
+  __malloc_session = NULL;
 }
 
 BOOL session_manager::init_sessions()
@@ -93,7 +104,7 @@ BOOL session_manager::insert_session(int socket, net_session* session)
   MAPSESSION::iterator map_iter = __map_sessions.find(socket);
   if(map_iter == __map_sessions.end())
   {
-    __map_sessions.insert(make_pair<int, net_session*>(socket, session));
+    __map_sessions.insert(std::make_pair<int, net_session*>(socket, session));
 
     return TRUE;
   }

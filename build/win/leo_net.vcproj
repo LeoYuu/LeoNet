@@ -49,7 +49,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
-				CompileAs="1"
+				CompileAs="2"
 				DisableSpecificWarnings="4996"
 			/>
 			<Tool
@@ -172,34 +172,18 @@
 	</References>
 	<Files>
 		<Filter
-			Name="net_server"
+			Name="include files"
 			>
-			<File
-				RelativePath="..\..\src\leo_net_service.c"
-				>
-			</File>
 			<File
 				RelativePath="..\..\src\leo_net_service.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="net_session"
-			>
-			<File
-				RelativePath="..\..\src\leo_net_session.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\src\leo_net_session.h"
 				>
 			</File>
-		</Filter>
-		<Filter
-			Name="ring_buffer"
-			>
 			<File
-				RelativePath="..\..\src\ring_buffer.cpp"
+				RelativePath="..\..\src\leo_singleton.h"
 				>
 			</File>
 			<File
@@ -207,14 +191,26 @@
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath="..\..\src\leo_singleton.h"
+		<Filter
+			Name="source files"
 			>
-		</File>
-		<File
-			RelativePath="..\..\src\main.c"
-			>
-		</File>
+			<File
+				RelativePath="..\..\src\leo_net_service.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\leo_net_session.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\main.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ring_buffer.cpp"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

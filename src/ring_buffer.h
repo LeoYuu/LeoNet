@@ -2,6 +2,8 @@
 #define __RING_BUFFER_H__
 
 #if defined WIN32
+# include <assert.h>
+# include <windows.h>
 # define mb() MemoryBarrier()
 # define rmb() MemoryBarrier()
 # define wmb() MemoryBarrier()

@@ -3,6 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "leo_net", "leo_net.vcproj", "{F2D1A566-8EC6-439C-90B0-20D9227944C5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "leo_protocols", "leo_protocols.vcproj", "{2BEE00A3-3F50-4BF8-B0CD-58933ADBACF2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "leo_encrypt", "leo_encrypt.vcproj", "{3A93682D-3E1A-44E0-AFB3-F741B874E7FB}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "leo_utilities", "leo_utilities.vcproj", "{39E6CCFC-70AB-473D-9862-CA36DF62DE73}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -13,6 +19,18 @@ Global
 		{F2D1A566-8EC6-439C-90B0-20D9227944C5}.Debug|Win32.Build.0 = Debug|Win32
 		{F2D1A566-8EC6-439C-90B0-20D9227944C5}.Release|Win32.ActiveCfg = Release|Win32
 		{F2D1A566-8EC6-439C-90B0-20D9227944C5}.Release|Win32.Build.0 = Release|Win32
+		{2BEE00A3-3F50-4BF8-B0CD-58933ADBACF2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2BEE00A3-3F50-4BF8-B0CD-58933ADBACF2}.Debug|Win32.Build.0 = Debug|Win32
+		{2BEE00A3-3F50-4BF8-B0CD-58933ADBACF2}.Release|Win32.ActiveCfg = Release|Win32
+		{2BEE00A3-3F50-4BF8-B0CD-58933ADBACF2}.Release|Win32.Build.0 = Release|Win32
+		{3A93682D-3E1A-44E0-AFB3-F741B874E7FB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3A93682D-3E1A-44E0-AFB3-F741B874E7FB}.Debug|Win32.Build.0 = Debug|Win32
+		{3A93682D-3E1A-44E0-AFB3-F741B874E7FB}.Release|Win32.ActiveCfg = Release|Win32
+		{3A93682D-3E1A-44E0-AFB3-F741B874E7FB}.Release|Win32.Build.0 = Release|Win32
+		{39E6CCFC-70AB-473D-9862-CA36DF62DE73}.Debug|Win32.ActiveCfg = Debug|Win32
+		{39E6CCFC-70AB-473D-9862-CA36DF62DE73}.Debug|Win32.Build.0 = Debug|Win32
+		{39E6CCFC-70AB-473D-9862-CA36DF62DE73}.Release|Win32.ActiveCfg = Release|Win32
+		{39E6CCFC-70AB-473D-9862-CA36DF62DE73}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
