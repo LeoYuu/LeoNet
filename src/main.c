@@ -19,6 +19,7 @@ on_accept(evutil_socket_t fd, struct sockaddr_in* sin, void* args) {
 
   session = session_manager::instance()->claim_one_session();
   if(session) {
+    session->set_socket(fd);
     session_manager::instance()->insert_session(fd, session);
   } else {
     printf("%s : can't find one free session\n", __FUNCTION__);
@@ -73,7 +74,7 @@ main(int argc, char* argv[]) {
   struct service_init si;
   evutil_socket_t listen_fd;
 
-#ifdef _WIN32
+#ifdef WIN32
   WSADATA wsaData;
   if (WSAStartup(MAKEWORD(2,2), &wsaData) != NO_ERROR)
     printf("Error at WSAStartup()\n");
@@ -92,6 +93,9 @@ main(int argc, char* argv[]) {
     return -1;
   }
 
+  session_manager::create_singleton();
+  session_manager::instance()->init_sessions();
+
   si.ui.__accept_cb = on_accept;
   si.ui.__read_cb = on_read;
   si.ui.__write_cb = on_write;
@@ -101,7 +105,7 @@ main(int argc, char* argv[]) {
     return -1;
   }
 
-  e = net_event_create(si.eb, listen_fd, EV_READ | EV_PERSIST, net_service_accept, &si);
+  e = net_event_create(si.eb, listen_fd, EV_READ | EV_PERSIST, net_event_accept, &si);
   if(NULL == e) {
     return -1;
   }
@@ -109,7 +113,7 @@ main(int argc, char* argv[]) {
   event_add(e, NULL);
   event_base_dispatch(si.eb);
 
-#ifdef _WIN32
+#ifdef WIN32
   WSACleanup();
 #endif
   return 0;

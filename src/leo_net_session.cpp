@@ -1,3 +1,4 @@
+#include "leo_net_service.h"
 #include "leo_net_session.h"
 
 net_session::net_session()
@@ -13,7 +14,7 @@ net_session::~net_session()
 {
   __read_buffer.clear();
   __write_buffer.clear();
-};
+}
 
 void net_session::init()
 {
@@ -32,12 +33,32 @@ int net_session::fetch_from_readbuffer(char* buf, int len)
 
 int net_session::push_to_writebuffer(char* buf, int len)
 {
+  if(__write_buffer.empty())
+  {
+    const struct net_rw_event* rw_events = net_service_get_evnets(get_socket());
+    if(rw_events && rw_events->ev_write)
+    {
+      net_event_add(rw_events->ev_write, 0);
+    }
+  }
+
   return __write_buffer.kfifo_put(buf, len);
 }
 
 int net_session::fetch_from_writebuffer(char* buf, int len)
 {
-  return __write_buffer.kfifo_get(buf, len);
+  int n = __write_buffer.kfifo_get(buf, len);
+
+  if(__write_buffer.empty())
+  {
+    const struct net_rw_event* rw_events = net_service_get_evnets(get_socket());
+    if(rw_events && rw_events->ev_write)
+    {
+      net_event_del(rw_events->ev_write);
+    }
+  }
+
+  return n;
 }
 
 session_manager::session_manager()

@@ -1,6 +1,8 @@
 #ifndef __RING_BUFFER_H__
 #define __RING_BUFFER_H__
 
+#include "leo_utilities.h"
+
 #if defined WIN32
 # include <assert.h>
 # include <windows.h>
@@ -63,7 +65,7 @@
 #define smp_wmb() wmb()
 
 // ÎÞËø»º³å¶ÓÁÐ.
-class ring_buffer
+class LEO_EXPORT ring_buffer
 {
 public:
   explicit ring_buffer(int buf_size);

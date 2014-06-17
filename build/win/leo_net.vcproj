@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libevent_core_debug.lib ws2_32.lib"
+				AdditionalDependencies="libevent_core_debug.lib ws2_32.lib leo_net_base.lib leo_utilities.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../libs/win/"
 				IgnoreAllDefaultLibraries="false"
@@ -175,19 +175,7 @@
 			Name="include files"
 			>
 			<File
-				RelativePath="..\..\src\leo_net_service.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\leo_net_session.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\leo_singleton.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\ring_buffer.h"
 				>
 			</File>
 		</Filter>
@@ -195,19 +183,11 @@
 			Name="source files"
 			>
 			<File
-				RelativePath="..\..\src\leo_net_service.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\leo_net_session.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\src\main.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\ring_buffer.cpp"
 				>
 			</File>
 		</Filter>

@@ -1,10 +1,5 @@
 #include "leo_net_service.h"
 
-struct net_rw_event {
-  struct event* ev_read;
-  struct event* ev_write;
-};
-
 static struct net_rw_event net_events[65535] = { 0 };
 
 evutil_socket_t
@@ -40,7 +35,7 @@ net_socket_listen(evutil_socket_t fd, int backlog) {
 int
 net_socket_recv(evutil_socket_t fd, char* buf, int len) {
   int n = 0;
-#ifdef _WIN32
+#ifdef WIN32
   n = recv(fd, buf, len, 0);
 #else
   n = read(fd, buf, len);
@@ -51,7 +46,7 @@ net_socket_recv(evutil_socket_t fd, char* buf, int len) {
 int
 net_socket_send(evutil_socket_t fd, char* buf, int len) {
   int n = 0;
-#ifdef _WIN32
+#ifdef WIN32
   n = send(fd, buf, len, 0);
 #else
   n = write(fd, buf, len);
@@ -89,7 +84,7 @@ net_service_release(struct event_base* eb) {
 }
 
 void
-net_service_accept(evutil_socket_t listen_fd, short events, void* args) {
+net_event_accept(evutil_socket_t listen_fd, short events, void* args) {
   int slen;
   evutil_socket_t fd;
   struct net_rw_event* ne;
@@ -106,10 +101,10 @@ net_service_accept(evutil_socket_t listen_fd, short events, void* args) {
 
   net_socket_nonblocking(fd);
 
-  ne = (struct net_rw_event*)malloc(sizeof(struct net_rw_event));
+  ne = &net_events[fd];/*(struct net_rw_event*)malloc(sizeof(struct net_rw_event));*/
   if(ne) {
-    ne->ev_read = net_event_create(si->eb, fd, EV_READ | EV_PERSIST, net_service_read, args);
-    ne->ev_write = net_event_create(si->eb, fd, EV_WRITE, net_service_write, args);
+    ne->ev_read = net_event_create(si->eb, fd, EV_READ | EV_PERSIST, net_event_read, args);
+    ne->ev_write = net_event_create(si->eb, fd, EV_WRITE | EV_PERSIST, net_event_write, args);
 
     if(!ne->ev_read || !ne->ev_write) {
       ne->ev_read ? free(ne->ev_read) : 0;
@@ -120,13 +115,12 @@ net_service_accept(evutil_socket_t listen_fd, short events, void* args) {
   }
 
   event_add(ne->ev_read, NULL);
-  event_add(ne->ev_write, NULL);
 
   si->ui.__accept_cb(fd, (struct sockaddr_in*)&ss, NULL);
 }
 
 void
-net_service_read(evutil_socket_t fd, short events, void* args) {
+net_event_read(evutil_socket_t fd, short events, void* args) {
   struct service_init* si;
 
   si = (struct service_init*)args;
@@ -135,7 +129,7 @@ net_service_read(evutil_socket_t fd, short events, void* args) {
 }
 
 void
-net_service_write(evutil_socket_t fd, short events, void* args) {
+net_event_write(evutil_socket_t fd, short events, void* args) {
   struct service_init* si;
 
   si = (struct service_init*)args;
@@ -154,7 +148,22 @@ net_event_release(struct event* e) {
 }
 
 int
+net_event_add(struct event* e, const struct timeval* tv) {
+  return event_add(e, tv);
+}
+
+int
+net_event_del(struct event* e) {
+  return event_del(e);
+}
+
+int
 net_event_reset(struct event* e, struct event_base* eb, evutil_socket_t fd, short events, event_cb cb, void* arg) {
   return event_assign(e, eb, fd, events, cb, arg);
+}
+
+const struct net_rw_event*
+net_service_get_evnets(evutil_socket_t fd) {
+  return &net_events[fd];
 }
 

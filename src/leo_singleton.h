@@ -3,8 +3,10 @@
 
 #include <assert.h>
 
+#include "leo_utilities.h"
+
 template <typename t>
-class leo_singleton
+class LEO_EXPORT leo_singleton
 {
 protected:
   leo_singleton() {}
@@ -14,7 +16,7 @@ protected:
 public:
   inline static void create_singleton()
   {
-    assert(__instance);
+    assert(!__instance);
     if(!__instance)
       __instance = new t;
     assert(__instance);

@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "leo_encrypt", "leo_encrypt.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "leo_utilities", "leo_utilities.vcproj", "{39E6CCFC-70AB-473D-9862-CA36DF62DE73}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "leo_net_base", "leo_net_base.vcproj", "{EE830459-1ED7-4C4D-AAC1-568EE8DB4122}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -31,6 +33,10 @@ Global
 		{39E6CCFC-70AB-473D-9862-CA36DF62DE73}.Debug|Win32.Build.0 = Debug|Win32
 		{39E6CCFC-70AB-473D-9862-CA36DF62DE73}.Release|Win32.ActiveCfg = Release|Win32
 		{39E6CCFC-70AB-473D-9862-CA36DF62DE73}.Release|Win32.Build.0 = Release|Win32
+		{EE830459-1ED7-4C4D-AAC1-568EE8DB4122}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EE830459-1ED7-4C4D-AAC1-568EE8DB4122}.Debug|Win32.Build.0 = Debug|Win32
+		{EE830459-1ED7-4C4D-AAC1-568EE8DB4122}.Release|Win32.ActiveCfg = Release|Win32
+		{EE830459-1ED7-4C4D-AAC1-568EE8DB4122}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

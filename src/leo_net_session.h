@@ -7,7 +7,7 @@
 #include "ring_buffer.h"
 #include "leo_singleton.h"
 
-#define MAX_SESSION 2000
+#define MAX_SESSION 10
 #define MAX_BUFFER_LEN 4096
 
 class net_session

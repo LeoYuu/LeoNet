@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="leo_utilities"
-	ProjectGUID="{39E6CCFC-70AB-473D-9862-CA36DF62DE73}"
-	RootNamespace="leo_utilities"
+	Name="leo_net_base"
+	ProjectGUID="{EE830459-1ED7-4C4D-AAC1-568EE8DB4122}"
+	RootNamespace="leo_net_base"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -41,6 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="../../include; ../../include/event2;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_BUILD_DLL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -60,7 +61,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="libevent_core_debug.lib ws2_32.lib"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="../../libs/win/"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -114,7 +117,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LEO_UTILITIES_EXPORTS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LEO_NET_BASE_EXPORTS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -171,7 +174,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\src\ring_buffer.cpp"
+				RelativePath="..\..\src\leo_net_service.c"
 				>
 			</File>
 		</Filter>
@@ -181,15 +184,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\src\leo_singleton.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\leo_utilities.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\ring_buffer.h"
+				RelativePath="..\..\src\leo_net_service.h"
 				>
 			</File>
 		</Filter>
