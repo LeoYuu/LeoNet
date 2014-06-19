@@ -8,6 +8,7 @@
 #include "leo_singleton.h"
 
 #define MAX_SESSION 10
+#define MAX_QUEUE_LEN 128
 #define MAX_BUFFER_LEN 4096
 
 class net_session
@@ -24,6 +25,11 @@ public:
   int fetch_from_readbuffer(char* buf, int len);
   int push_to_writebuffer(char* buf, int len);
   int fetch_from_writebuffer(char* buf, int len);
+
+  bool push_to_readqueue(net_message* nm);
+  net_message* fetch_from_readqueue(net_message* nm);
+  bool push_to_writequeue(net_message* nm);
+  net_message* fetch_from_writequeue(net_message* nm);
 
 public:
   inline void set_socket(int fd)
@@ -51,6 +57,8 @@ private:
   int __session_id;
   ring_buffer __read_buffer;
   ring_buffer __write_buffer;
+  static_lock_free_queue<net_message*, MAX_QUEUE_LEN> __read_queue;  /* using by net & logic thread(thread safe). */
+  static_lock_free_queue<net_message*, MAX_QUEUE_LEN> __write_queue; /* using by net & logic thread(thread safe). */
 };
 
 typedef std::vector<net_session*> VCTSESSION;

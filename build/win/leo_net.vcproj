@@ -175,6 +175,10 @@
 			Name="include files"
 			>
 			<File
+				RelativePath="..\..\src\leo_net_message.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\leo_net_session.h"
 				>
 			</File>
@@ -182,6 +186,10 @@
 		<Filter
 			Name="source files"
 			>
+			<File
+				RelativePath="..\..\src\leo_net_message.cpp"
+				>
+			</File>
 			<File
 				RelativePath="..\..\src\leo_net_session.cpp"
 				>

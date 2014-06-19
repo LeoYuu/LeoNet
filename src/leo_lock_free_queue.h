@@ -1,42 +1,44 @@
 #ifndef __LEO_LOCK_FREE_QUEUE_H__
 #define __LEO_LOCK_FREE_QUEUE_H__
 
-#include <list>
-
-template <typename t>
-class lock_free_queue
+/* 单生产者、单消费者模型 */
+template <typename t, int n>
+class static_lock_free_queue
 {
 public:
-  lock_free_queue()
+  void init_queue()
   {
-    list.push_back(t());
-    __head = list.begin();
-    __tail = list.end();
+    __push_index = 0;
+    __pop_index = 0;
+    memset(__queue, 0, sizeof(__queue));
   }
 
-  void push(const t& _t)
+  bool push(t _t)
   {
-    list.push_back(_t);
-    __tail = list.end();
-    list.erase(list.begin(), __head);
-  }
-
-  BOOL pop(t& _t)
-  {
-    std::list<t>::iterator it = __head;
-    ++it;
-    if(it != __tail)
+    if(__push_index - __pop_index < n)
     {
-      __head = it;
-      t = *__head;
-      return TRUE;
+      __queue[__push_index & (n - 1)] = _t;
+      __push_index++;
+      return true;
     }
-    return FALSE;
+    return false;
   }
+
+  bool pop(t& _t)
+  {
+    if(__push_index != __pop_index)
+    {
+      _t = __queue[__pop_index & (n - 1)];
+      __pop_index++;
+      return true;
+    }
+    return false;
+  }
+
 private:
-  std::list<t> __list;
-  std::list<t>::iterator __head;
-  std::list<t>::iterator __tail;
+  t __queue[n];
+  unsigned int __push_index;
+  unsigned int __pop_index;
 };
 
 #endif /* __LEO_LOCK_FREE_QUEUE_H__ */

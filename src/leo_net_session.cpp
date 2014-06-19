@@ -61,6 +61,26 @@ int net_session::fetch_from_writebuffer(char* buf, int len)
   return n;
 }
 
+bool net_session::push_to_readqueue(net_message* nm)
+{
+  return __read_queue.push(nm);
+}
+
+bool net_session::fetch_from_readqueue(net_message* nm)
+{
+  return __read_queue.pop(nm);
+}
+
+bool net_session::push_to_writequeue(net_message* nm)
+{
+  return __write_queue.push(nm);
+}
+
+bool net_session::fetch_from_writequeue(net_message* nm)
+{
+  return __write_queue.pop(nm);
+}
+
 session_manager::session_manager()
 : __session_id(0)
 , __malloc_session(NULL)

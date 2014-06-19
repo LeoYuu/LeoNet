@@ -181,6 +181,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\src\leo_lock_free_queue.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\leo_singleton.h"
 				>
 			</File>
