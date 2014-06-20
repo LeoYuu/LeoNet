@@ -18,10 +18,10 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			OutputDirectory="..\..\libs\win"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
-			CharacterSet="1"
+			CharacterSet="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LEO_PROTOCOLS_EXPORTS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_BUILD_DLL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -170,6 +170,10 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
+			<File
+				RelativePath="..\..\src\leo_tcp_game_protocol.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="include files"
@@ -178,6 +182,10 @@
 			>
 			<File
 				RelativePath="..\..\src\leo_protocols.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\leo_tcp_game_protocol.h"
 				>
 			</File>
 		</Filter>

@@ -4,6 +4,7 @@
 #include "util.h"
 #include "leo_net_service.h"
 #include "leo_net_session.h"
+#include "leo_tcp_game_protocol.h"
 
 #define PORT 6000
 #define BACKLOG 100
@@ -30,14 +31,23 @@ on_accept(evutil_socket_t fd, struct sockaddr_in* sin, void* args) {
 void
 on_read(evutil_socket_t fd, void* args) {
   int len;
-  char buf[MAX_BUFFER_LEN];
+  int message_len;
   net_session* session;
+  char buf[MAX_BUFFER_LEN];
 
   session = session_manager::instance()->get_one_session(fd);
   if(session) {
     len = net_socket_recv(fd, buf, sizeof(buf));
     if(len > 0) {
       session->push_to_readbuffer(buf, len);
+
+      do
+      {
+        message_len = session->peek_message_size();
+        /* 根据协议填充消息包 */
+
+      }while(session->readbuffer_used_size() >= message_len);
+    
     } else {
 
     }
@@ -50,12 +60,26 @@ on_read(evutil_socket_t fd, void* args) {
 void
 on_write(evutil_socket_t fd, void* args) {
   int len;
+  bool ret;
   char buf[MAX_BUFFER_LEN];
   net_session* session;
+  net_message* message;
 
   session = session_manager::instance()->get_one_session(fd);
   if(session) {
-    len = session->fetch_from_writebuffer(buf, sizeof(len));
+    do 
+    {
+      ret = session->fetch_from_writequeue(message);
+      if(ret) {
+        /* 根据消息包填充buffer */
+        len = transform_message_to_buffer(message, buf, sizeof(buf));
+        if(len > 0) {
+          session->push_to_writebuffer(buf, len);
+        }
+      }
+    }while(ret);
+    
+    len = session->fetch_from_writebuffer(buf, sizeof(buf));
     len = net_socket_send(fd, buf, len);
     if(len > 0) {
       

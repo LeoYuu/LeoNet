@@ -6,6 +6,8 @@
 
 #include "ring_buffer.h"
 #include "leo_singleton.h"
+#include "leo_net_message.h"
+#include "leo_lock_free_queue.h"
 
 #define MAX_SESSION 10
 #define MAX_QUEUE_LEN 128
@@ -27,9 +29,13 @@ public:
   int fetch_from_writebuffer(char* buf, int len);
 
   bool push_to_readqueue(net_message* nm);
-  net_message* fetch_from_readqueue(net_message* nm);
+  bool fetch_from_readqueue(net_message* nm);
   bool push_to_writequeue(net_message* nm);
-  net_message* fetch_from_writequeue(net_message* nm);
+  bool fetch_from_writequeue(net_message* nm);
+
+  int readbuffer_used_size();
+  int writebuffer_used_size();
+  unsigned short peek_message_size();
 
 public:
   inline void set_socket(int fd)

@@ -1,7 +1,10 @@
 #ifndef __LEO_LOCK_FREE_QUEUE_H__
 #define __LEO_LOCK_FREE_QUEUE_H__
 
-/* 单生产者、单消费者模型 */
+/* 
+ *  单生产者、单消费者模型 
+ *  n 必须是2的整数次方
+ */
 template <typename t, int n>
 class static_lock_free_queue
 {
@@ -13,7 +16,7 @@ public:
     memset(__queue, 0, sizeof(__queue));
   }
 
-  bool push(t _t)
+  bool push_back(t _t)
   {
     if(__push_index - __pop_index < n)
     {
@@ -24,7 +27,7 @@ public:
     return false;
   }
 
-  bool pop(t& _t)
+  bool pop_front(t& _t)
   {
     if(__push_index != __pop_index)
     {
@@ -33,6 +36,22 @@ public:
       return true;
     }
     return false;
+  }
+
+  void empty()
+  {
+    __push_index = 0;
+    __pop_index = 0;
+  }
+
+  bool is_empty()
+  {
+    return (__push_index == __pop_index);
+  }
+
+  bool is_full()
+  {
+    return (__push_index - __pop_index >= n);
   }
 
 private:

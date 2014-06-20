@@ -63,22 +63,40 @@ int net_session::fetch_from_writebuffer(char* buf, int len)
 
 bool net_session::push_to_readqueue(net_message* nm)
 {
-  return __read_queue.push(nm);
+  return __read_queue.push_back(nm);
 }
 
 bool net_session::fetch_from_readqueue(net_message* nm)
 {
-  return __read_queue.pop(nm);
+  return __read_queue.pop_front(nm);
 }
 
 bool net_session::push_to_writequeue(net_message* nm)
 {
-  return __write_queue.push(nm);
+  return __write_queue.push_back(nm);
 }
 
 bool net_session::fetch_from_writequeue(net_message* nm)
 {
-  return __write_queue.pop(nm);
+  return __write_queue.pop_front(nm);
+}
+
+int net_session::readbuffer_used_size()
+{
+  return __read_buffer.used();
+}
+
+int net_session::writebuffer_used_size()
+{
+  return __write_buffer.used();
+}
+
+unsigned short net_session::peek_message_size()
+{
+  unsigned short s = 0;
+  __read_buffer.peek((char*)&s, sizeof(s));
+
+  return s;
 }
 
 session_manager::session_manager()
