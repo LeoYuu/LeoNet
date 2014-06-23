@@ -19,39 +19,7 @@ ring_buffer::~ring_buffer()
   __ring_buffer = NULL;
 }
 
-unsigned int ring_buffer::kfifo_put(char* buffer, unsigned int len)
-{
-  if(len == 0)
-    return 0;
-
-  unsigned int iLen;
-  len = _min(len, __buffer_size - __write_p + __read_p);
-
-  /*
-  * Ensure that we sample the fifo->out index -before- we
-  * start putting bytes into the kfifo.
-  */
-  smp_mb();                                 /*===>B2*/ 
-
-  /* first put the data starting from fifo->in to buffer end */
-  iLen = _min(len, __buffer_size - (__write_p & (__buffer_size - 1)));
-  memcpy(__ring_buffer + (__write_p & (__buffer_size - 1)), buffer, iLen);
-
-  /* then put the rest (if any) at the beginning of the buffer */
-  memcpy(__ring_buffer, buffer + iLen, len - iLen);
-
-  /*
-  * Ensure that we add the bytes to the kfifo -before-
-  * we update the fifo->in index.
-  */
-  smp_wmb();                                 /*===>A1*/
-
-  __write_p += len;
-
-  return len;
-}
-
-unsigned int ring_buffer::peek(char* buffer, unsigned int len)
+unsigned int ring_buffer::peek_read(char* buffer, unsigned int len)
 {
   if(empty() || used() < len)
     return 0;
@@ -84,12 +52,51 @@ unsigned int ring_buffer::peek(char* buffer, unsigned int len)
   return len;
 }
 
-bool ring_buffer::seekread(unsigned int len)
+bool ring_buffer::seek_read(unsigned int len)
 {
-  if (used() < len)
+  if(used() < len)
     return false;
 
   __read_p += len;
+  return true;
+}
+
+unsigned int ring_buffer::peek_write(char* buffer, unsigned int len)
+{
+  if(len == 0 || available() < len)
+    return 0;
+
+  unsigned int iLen;
+  len = _min(len, __buffer_size - __write_p + __read_p);
+
+  /*
+  * Ensure that we sample the fifo->out index -before- we
+  * start putting bytes into the kfifo.
+  */
+  smp_mb();                                 /*===>B2*/ 
+
+  /* first put the data starting from fifo->in to buffer end */
+  iLen = _min(len, __buffer_size - (__write_p & (__buffer_size - 1)));
+  memcpy(__ring_buffer + (__write_p & (__buffer_size - 1)), buffer, iLen);
+
+  /* then put the rest (if any) at the beginning of the buffer */
+  memcpy(__ring_buffer, buffer + iLen, len - iLen);
+
+  /*
+  * Ensure that we add the bytes to the kfifo -before-
+  * we update the fifo->in index.
+  */
+  smp_wmb();                                 /*===>A1*/
+
+  return len;
+}
+
+bool ring_buffer::seek_write(unsigned int len)
+{
+  if(available() < len)
+    return false;
+
+  __write_p += len;
   return true;
 }
 
@@ -121,5 +128,37 @@ unsigned int ring_buffer::kfifo_get(char* buffer, unsigned int len)
   smp_mb();                       /*===>B2*/
 
   __read_p += len;
+  return len;
+}
+
+unsigned int ring_buffer::kfifo_put(char* buffer, unsigned int len)
+{
+  if(len == 0)
+    return 0;
+
+  unsigned int iLen;
+  len = _min(len, __buffer_size - __write_p + __read_p);
+
+  /*
+  * Ensure that we sample the fifo->out index -before- we
+  * start putting bytes into the kfifo.
+  */
+  smp_mb();                                 /*===>B2*/ 
+
+  /* first put the data starting from fifo->in to buffer end */
+  iLen = _min(len, __buffer_size - (__write_p & (__buffer_size - 1)));
+  memcpy(__ring_buffer + (__write_p & (__buffer_size - 1)), buffer, iLen);
+
+  /* then put the rest (if any) at the beginning of the buffer */
+  memcpy(__ring_buffer, buffer + iLen, len - iLen);
+
+  /*
+  * Ensure that we add the bytes to the kfifo -before-
+  * we update the fifo->in index.
+  */
+  smp_wmb();                                 /*===>A1*/
+
+  __write_p += len;
+
   return len;
 }

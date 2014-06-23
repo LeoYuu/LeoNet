@@ -21,21 +21,41 @@ public:
 
 public:
   void init();
+  void add_write_event();
+  void del_write_event();
 
 public:
-  int push_to_readbuffer(char* buf, int len);
-  int fetch_from_readbuffer(char* buf, int len);
-  int push_to_writebuffer(char* buf, int len);
-  int fetch_from_writebuffer(char* buf, int len);
+  inline bool push_to_readqueue(net_message* nm)
+  {
+    return __read_queue.push_back(nm);
+  }
 
-  bool push_to_readqueue(net_message* nm);
-  bool fetch_from_readqueue(net_message* nm);
-  bool push_to_writequeue(net_message* nm);
-  bool fetch_from_writequeue(net_message* nm);
+  inline bool fetch_from_readqueue(net_message* nm)
+  {
+    return __read_queue.pop_front(nm);
+  }
 
-  int readbuffer_used_size();
-  int writebuffer_used_size();
-  unsigned short peek_message_size();
+  inline bool push_to_writequeue(net_message* nm)
+  {
+    if(__write_buffer.empty())
+    {
+      add_write_event();
+    }
+    return __write_queue.push_back(nm);
+  }
+
+  inline bool fetch_from_writequeue(net_message* nm)
+  {
+    return __write_queue.pop_front(nm);
+  }
+
+  inline unsigned short peek_message_size()
+  {
+    unsigned short s = 0;
+    __read_buffer.peek_read((char*)&s, sizeof(s));
+
+    return s;
+  }
 
 public:
   inline void set_socket(int fd)
@@ -56,6 +76,16 @@ public:
   inline int get_session_id()
   {
     return __session_id;
+  }
+
+  inline ring_buffer* get_rb()
+  {
+    return &__read_buffer;
+  }
+
+  inline ring_buffer* get_wb()
+  {
+    return &__write_buffer;
   }
 
 private:

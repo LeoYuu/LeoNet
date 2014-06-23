@@ -21,82 +21,23 @@ void net_session::init()
 
 }
 
-int net_session::push_to_readbuffer(char* buf, int len)
+// TODO: move to leo_net_base library later.
+void net_session::add_write_event()
 {
-  return __read_buffer.kfifo_put(buf, len);
-}
-
-int net_session::fetch_from_readbuffer(char* buf, int len)
-{
-  return __read_buffer.kfifo_get(buf, len);
-}
-
-int net_session::push_to_writebuffer(char* buf, int len)
-{
-  if(__write_buffer.empty())
+  const struct net_rw_event* rw_events = net_service_get_evnets(get_socket());
+  if(rw_events && rw_events->ev_write)
   {
-    const struct net_rw_event* rw_events = net_service_get_evnets(get_socket());
-    if(rw_events && rw_events->ev_write)
-    {
-      net_event_add(rw_events->ev_write, 0);
-    }
+    net_event_add(rw_events->ev_write, 0);
   }
-
-  return __write_buffer.kfifo_put(buf, len);
 }
 
-int net_session::fetch_from_writebuffer(char* buf, int len)
+void net_session::del_write_event()
 {
-  int n = __write_buffer.kfifo_get(buf, len);
-
-  if(__write_buffer.empty())
+  const struct net_rw_event* rw_events = net_service_get_evnets(get_socket());
+  if(rw_events && rw_events->ev_write)
   {
-    const struct net_rw_event* rw_events = net_service_get_evnets(get_socket());
-    if(rw_events && rw_events->ev_write)
-    {
-      net_event_del(rw_events->ev_write);
-    }
+    net_event_del(rw_events->ev_write);
   }
-
-  return n;
-}
-
-bool net_session::push_to_readqueue(net_message* nm)
-{
-  return __read_queue.push_back(nm);
-}
-
-bool net_session::fetch_from_readqueue(net_message* nm)
-{
-  return __read_queue.pop_front(nm);
-}
-
-bool net_session::push_to_writequeue(net_message* nm)
-{
-  return __write_queue.push_back(nm);
-}
-
-bool net_session::fetch_from_writequeue(net_message* nm)
-{
-  return __write_queue.pop_front(nm);
-}
-
-int net_session::readbuffer_used_size()
-{
-  return __read_buffer.used();
-}
-
-int net_session::writebuffer_used_size()
-{
-  return __write_buffer.used();
-}
-
-unsigned short net_session::peek_message_size()
-{
-  unsigned short s = 0;
-  __read_buffer.peek((char*)&s, sizeof(s));
-
-  return s;
 }
 
 session_manager::session_manager()

@@ -98,14 +98,33 @@ public:
     return __buffer_size == used();
   }
 
+  inline char* write_p()
+  {
+    return &__ring_buffer[__write_p & (__buffer_size - 1)];
+  }
+
+  inline char* read_p()
+  {
+    return &__ring_buffer[__read_p & (__buffer_size - 1)];
+  }
+
   /*
   * Read data but don't move the m_read_p.
   */
-  unsigned int peek(char* buffer, unsigned int len);
+  unsigned int peek_read(char* buffer, unsigned int len);
   /*
   * Move the m_read_p
   */
-  bool seekread(unsigned int len);
+  bool seek_read(unsigned int len);
+
+  /*
+  * Write data but don't move the m_write_p.
+  */
+  unsigned int peek_write(char* buffer, unsigned int len);
+  /*
+  * Move the m_write_p
+  */
+  bool seek_write(unsigned int len);
 
   /* 
   * put_data - puts some data into the FIFO, no locking version 

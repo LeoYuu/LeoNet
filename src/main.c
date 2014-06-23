@@ -31,22 +31,27 @@ on_accept(evutil_socket_t fd, struct sockaddr_in* sin, void* args) {
 void
 on_read(evutil_socket_t fd, void* args) {
   int len;
-  int message_len;
+  ring_buffer* rb;
   net_session* session;
-  char buf[MAX_BUFFER_LEN];
+  net_message* message;
+  unsigned short message_len;
 
   session = session_manager::instance()->get_one_session(fd);
   if(session) {
-    len = net_socket_recv(fd, buf, sizeof(buf));
+    rb = session->get_rb();
+    len = net_socket_recv(fd, rb->write_p(), rb->available());
     if(len > 0) {
-      session->push_to_readbuffer(buf, len);
+      rb->seek_write(len);
 
       do
       {
         message_len = session->peek_message_size();
-        /* 根据协议填充消息包 */
 
-      }while(session->readbuffer_used_size() >= message_len);
+        transform_buffer_to_message(message, rb->read_p(), message_len);
+
+        rb->seek_read(message_len);
+
+      }while(rb->used() >= message_len);
     
     } else {
 
@@ -61,28 +66,29 @@ void
 on_write(evutil_socket_t fd, void* args) {
   int len;
   bool ret;
-  char buf[MAX_BUFFER_LEN];
+  ring_buffer* wb;
   net_session* session;
   net_message* message;
 
   session = session_manager::instance()->get_one_session(fd);
   if(session) {
+    wb = session->get_wb();
     do 
     {
       ret = session->fetch_from_writequeue(message);
       if(ret) {
-        /* 根据消息包填充buffer */
-        len = transform_message_to_buffer(message, buf, sizeof(buf));
+        len = transform_message_to_buffer(message, wb->write_p(), message->get_real_size());
         if(len > 0) {
-          session->push_to_writebuffer(buf, len);
+          wb->seek_write(len);
         }
       }
     }while(ret);
     
-    len = session->fetch_from_writebuffer(buf, sizeof(buf));
-    len = net_socket_send(fd, buf, len);
+    len = net_socket_send(fd, wb->read_p(), wb->used());
     if(len > 0) {
-      
+      if(wb->empty()) {
+        session->del_write_event();
+      }
     } else {
 
     }
