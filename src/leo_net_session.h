@@ -4,10 +4,10 @@
 #include <map>
 #include <vector>
 
-#include "ring_buffer.h"
 #include "leo_singleton.h"
 #include "leo_net_message.h"
 #include "leo_lock_free_queue.h"
+#include "leo_tcp_game_protocol.h"
 
 #define MAX_SESSION 10
 #define MAX_QUEUE_LEN 128
@@ -21,8 +21,6 @@ public:
 
 public:
   void init();
-  void add_write_event();
-  void del_write_event();
 
 public:
   inline bool push_to_readqueue(net_message* nm)
@@ -37,24 +35,12 @@ public:
 
   inline bool push_to_writequeue(net_message* nm)
   {
-    if(__write_buffer.empty())
-    {
-      add_write_event();
-    }
     return __write_queue.push_back(nm);
   }
 
   inline bool fetch_from_writequeue(net_message* nm)
   {
     return __write_queue.pop_front(nm);
-  }
-
-  inline unsigned short peek_message_size()
-  {
-    unsigned short s = 0;
-    __read_buffer.peek_read((char*)&s, sizeof(s));
-
-    return s;
   }
 
 public:
@@ -78,21 +64,15 @@ public:
     return __session_id;
   }
 
-  inline ring_buffer* get_rb()
+  inline struct about_crypt* get_crypt()
   {
-    return &__read_buffer;
-  }
-
-  inline ring_buffer* get_wb()
-  {
-    return &__write_buffer;
+    return &__crypt;
   }
 
 private:
   int __socket;
   int __session_id;
-  ring_buffer __read_buffer;
-  ring_buffer __write_buffer;
+  struct about_crypt __crypt;
   static_lock_free_queue<net_message*, MAX_QUEUE_LEN> __read_queue;  /* using by net & logic thread(thread safe). */
   static_lock_free_queue<net_message*, MAX_QUEUE_LEN> __write_queue; /* using by net & logic thread(thread safe). */
 };
@@ -107,15 +87,15 @@ public:
   ~session_manager();
 
 public:
-  BOOL init_sessions();
+  bool init_sessions();
   int generate_session_id();
 
   net_session* claim_one_session();
   void reclaim_one_session(net_session* session);
 
   net_session* get_one_session(int socket);
-  BOOL insert_session(int socket, net_session* session);
-  BOOL remove_session(int socket);
+  bool insert_session(int socket, net_session* session);
+  bool remove_session(int socket);
 
 private:
   int __session_id;

@@ -35,6 +35,11 @@ public:
     __real_size = _size;
   }
 
+  inline char* get_data()
+  {
+    return __buffer;
+  }
+
   template <typename t>
   t* pop_ptr()
   {

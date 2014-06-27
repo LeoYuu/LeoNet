@@ -9,19 +9,35 @@
 #define PORT 6000
 #define BACKLOG 100
 
+static ev_ssize_t pre_read(struct evbuffer* rb, void* buf, size_t len) {
+  return evbuffer_copyout(rb, buf, len);
+}
+
 void
 on_accept(evutil_socket_t fd, struct sockaddr_in* sin, void* args) {
-  const char* connection_ip;
-  struct service_init* si;
+  int len;
+  char buf[32];
   net_session* session;
+  struct about_crypt* ac;
+  struct bufferevent* bev;
+  const char* connection_ip;
+  struct evbuffer* write_buffer;
+
+  bev = (struct bufferevent*)args;
+  write_buffer = bufferevent_get_output(bev);
 
   connection_ip = inet_ntoa(sin->sin_addr);
   printf("accept connection[socket:%d][ip:%s][port:%d].\n", fd, connection_ip, sin->sin_port);
 
   session = session_manager::instance()->claim_one_session();
   if(session) {
+    ac = session->get_crypt();
     session->set_socket(fd);
     session_manager::instance()->insert_session(fd, session);
+
+    len = send_key(ac, buf);
+    evbuffer_add(write_buffer, buf, len);
+
   } else {
     printf("%s : can't find one free session\n", __FUNCTION__);
     return;
@@ -31,67 +47,68 @@ on_accept(evutil_socket_t fd, struct sockaddr_in* sin, void* args) {
 void
 on_read(evutil_socket_t fd, void* args) {
   int len;
-  ring_buffer* rb;
+  char buf[1024 + 64];
   net_session* session;
   net_message* message;
+  struct about_crypt* ac;
   unsigned short message_len;
-
+  struct evbuffer* read_buffer = (struct evbuffer*)args;
+  
   session = session_manager::instance()->get_one_session(fd);
   if(session) {
-    rb = session->get_rb();
-    len = net_socket_recv(fd, rb->write_p(), rb->available());
-    if(len > 0) {
-      rb->seek_write(len);
+    ac = session->get_crypt();
+    do 
+    {
+      len = pre_read(read_buffer, (void*)&message_len, sizeof(message_len));
+      if(len < (sizeof(message_len))) {
+        break;
+      }
 
-      do
-      {
-        message_len = session->peek_message_size();
+      message_len ^= (ac->session_key & 0x0000ffff);
+      if(message_len + sizeof(message_len) > evbuffer_get_length(read_buffer)) {
+        break;
+      }
 
-        transform_buffer_to_message(message, rb->read_p(), message_len);
+      evbuffer_remove(read_buffer, buf, message_len + sizeof(message_len));
 
-        rb->seek_read(message_len);
+      message = new net_message();
+      if(0 == message) {
+        printf("on_read: malloc message failed!");
+        break;
+      }
 
-      }while(rb->used() >= message_len);
-    
-    } else {
+      transform_buffer_to_message(ac, message, buf, message_len);
+      session->push_to_readqueue(message);
 
-    }
+    }while(true);
   } else {
     printf("%s : can't find the session[fd:%d]!", __FUNCTION__, fd);
-    return;
   }
+  return;
 }
 
 void
 on_write(evutil_socket_t fd, void* args) {
   int len;
   bool ret;
-  ring_buffer* wb;
+  char buf[1024 + 64];
   net_session* session;
   net_message* message;
+  struct about_crypt* ac;
+  struct evbuffer* write_buffer = (struct evbuffer*)args;
 
   session = session_manager::instance()->get_one_session(fd);
   if(session) {
-    wb = session->get_wb();
+    ac = session->get_crypt();
     do 
     {
+      message = 0;
       ret = session->fetch_from_writequeue(message);
       if(ret) {
-        len = transform_message_to_buffer(message, wb->write_p(), message->get_real_size());
-        if(len > 0) {
-          wb->seek_write(len);
-        }
+        len = transform_message_to_buffer(ac, message, buf, sizeof(buf));
+        evbuffer_add(write_buffer, buf, len);
       }
     }while(ret);
-    
-    len = net_socket_send(fd, wb->read_p(), wb->used());
-    if(len > 0) {
-      if(wb->empty()) {
-        session->del_write_event();
-      }
-    } else {
-
-    }
   } else {
     printf("%s : can't find the session[fd:%d]!", __FUNCTION__, fd);
     return;
@@ -106,7 +123,7 @@ main(int argc, char* argv[]) {
 
 #ifdef WIN32
   WSADATA wsaData;
-  if (WSAStartup(MAKEWORD(2,2), &wsaData) != NO_ERROR)
+  if(WSAStartup(MAKEWORD(2,2), &wsaData) != NO_ERROR)
     printf("Error at WSAStartup()\n");
 #endif
 
@@ -123,6 +140,8 @@ main(int argc, char* argv[]) {
     return -1;
   }
 
+  initial_xor_keys();
+  initial_crc32_table();
   session_manager::create_singleton();
   session_manager::instance()->init_sessions();
 

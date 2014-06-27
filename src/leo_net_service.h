@@ -2,6 +2,8 @@
 #define __LEO_NET_SERVICE_H__
 
 #include "event2/event.h"
+#include "event2/buffer.h"
+#include "event2/bufferevent.h"
 
 #if defined(WIN32) && defined(_BUILD_DLL)
 # define LEO_EXPORT __declspec(dllexport)
@@ -17,11 +19,6 @@ typedef void(* accept_cb)(evutil_socket_t, struct sockaddr_in*, void*);
 typedef void(* read_cb)(evutil_socket_t, void*);
 typedef void(* write_cb)(evutil_socket_t, void*);
 typedef void(* event_cb)(evutil_socket_t, short, void*);
-
-struct net_rw_event {
-  struct event* ev_read;
-  struct event* ev_write;
-};
 
 struct user_init {
   read_cb __read_cb;
@@ -64,11 +61,9 @@ LEO_EXPORT int net_event_reset(struct event* e, struct event_base* eb, evutil_so
  
 /* callback function for accept/read/write event */
 LEO_EXPORT void net_event_accept(evutil_socket_t fd, short events, void* args);
-LEO_EXPORT void net_event_read(evutil_socket_t fd, short events, void* args);
-LEO_EXPORT void net_event_write(evutil_socket_t fd, short events, void* args);
-
-/* get rw events */
-LEO_EXPORT const struct net_rw_event* net_service_get_evnets(evutil_socket_t fd);
+LEO_EXPORT void net_event_read(struct bufferevent* bev, void* args);
+LEO_EXPORT void net_event_write(struct bufferevent* bev, void* args);
+LEO_EXPORT void net_event_error(struct bufferevent* bev, short what, void* args);
 
 #ifdef __cplusplus
   }

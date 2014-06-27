@@ -4,40 +4,17 @@
 net_session::net_session()
 : __socket(0)
 , __session_id(0)
-, __read_buffer(MAX_BUFFER_LEN)
-, __write_buffer(MAX_BUFFER_LEN)
 {
-
+  memset(&__crypt, 0, sizeof(__crypt));
 }
 
 net_session::~net_session()
 {
-  __read_buffer.clear();
-  __write_buffer.clear();
 }
 
 void net_session::init()
 {
 
-}
-
-// TODO: move to leo_net_base library later.
-void net_session::add_write_event()
-{
-  const struct net_rw_event* rw_events = net_service_get_evnets(get_socket());
-  if(rw_events && rw_events->ev_write)
-  {
-    net_event_add(rw_events->ev_write, 0);
-  }
-}
-
-void net_session::del_write_event()
-{
-  const struct net_rw_event* rw_events = net_service_get_evnets(get_socket());
-  if(rw_events && rw_events->ev_write)
-  {
-    net_event_del(rw_events->ev_write);
-  }
 }
 
 session_manager::session_manager()
@@ -58,7 +35,7 @@ session_manager::~session_manager()
   __malloc_session = NULL;
 }
 
-BOOL session_manager::init_sessions()
+bool session_manager::init_sessions()
 {
   __malloc_session = new net_session[MAX_SESSION];
   if(__malloc_session)
@@ -67,9 +44,10 @@ BOOL session_manager::init_sessions()
     {
       __vct_sessions.push_back(&__malloc_session[i]);
     }
+    return true;
   }
 
-  return FALSE;
+  return false;
 }
 
 net_session* session_manager::claim_one_session()
@@ -97,7 +75,7 @@ void session_manager::reclaim_one_session(net_session* session)
   session = NULL;
 }
 
-BOOL session_manager::insert_session(int socket, net_session* session)
+bool session_manager::insert_session(int socket, net_session* session)
 {
   assert(socket > 0 && session);
 
@@ -106,16 +84,16 @@ BOOL session_manager::insert_session(int socket, net_session* session)
   {
     __map_sessions.insert(std::make_pair<int, net_session*>(socket, session));
 
-    return TRUE;
+    return true;
   }
   else
   {
     printf("session-manager: insert session error[exist].");
-    return FALSE;
+    return false;
   }
 }
 
-BOOL session_manager::remove_session(int socket)
+bool session_manager::remove_session(int socket)
 {
   assert(socket > 0);
 
@@ -123,12 +101,12 @@ BOOL session_manager::remove_session(int socket)
   if(map_iter == __map_sessions.end())
   {
     printf("session-manager: remove session error[inexist].");
-    return FALSE;
+    return false;
   }
   else
   {
     __map_sessions.erase(map_iter);
-    return TRUE;
+    return true;
   }
 }
 

@@ -1,7 +1,5 @@
 #include "leo_net_service.h"
 
-static struct net_rw_event net_events[65535] = { 0 };
-
 evutil_socket_t
 net_socket_open() {
   return socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -87,7 +85,7 @@ void
 net_event_accept(evutil_socket_t listen_fd, short events, void* args) {
   int slen;
   evutil_socket_t fd;
-  struct net_rw_event* ne;
+  struct bufferevent* bev;
   struct service_init* si;
   struct sockaddr_storage ss;
 
@@ -101,40 +99,61 @@ net_event_accept(evutil_socket_t listen_fd, short events, void* args) {
 
   net_socket_nonblocking(fd);
 
-  ne = &net_events[fd];/*(struct net_rw_event*)malloc(sizeof(struct net_rw_event));*/
-  if(ne) {
-    ne->ev_read = net_event_create(si->eb, fd, EV_READ | EV_PERSIST, net_event_read, args);
-    ne->ev_write = net_event_create(si->eb, fd, EV_WRITE | EV_PERSIST, net_event_write, args);
+  bev = bufferevent_socket_new(si->eb, fd, BEV_OPT_CLOSE_ON_FREE);
+  if(bev) {
+    bufferevent_setcb(bev, net_event_read, net_event_write, net_event_error, args);
+    bufferevent_enable(bev, EV_READ | EV_WRITE);
 
-    if(!ne->ev_read || !ne->ev_write) {
-      ne->ev_read ? free(ne->ev_read) : 0;
-      ne->ev_write ? free(ne->ev_write) : 0;
-      free(ne);
-      ne = 0;
-    }
+    si->ui.__accept_cb(fd, (struct sockaddr_in*)&ss, (void*)bev);
+  } else {
+
+  }
+}
+
+void
+net_event_read(struct bufferevent* bev, void* args) {
+  evutil_socket_t fd;
+  struct service_init* si;
+  struct evbuffer* __read_buffer;
+
+  si = (struct service_init*)args;
+
+  fd = bufferevent_getfd(bev);
+  __read_buffer = bufferevent_get_input(bev);
+
+  si->ui.__read_cb(fd, (void*)__read_buffer);
+}
+
+void
+net_event_write(struct bufferevent* bev, void* args) {
+  evutil_socket_t fd;
+  struct service_init* si;
+  struct evbuffer* __write_buffer;
+
+  si = (struct service_init*)args;
+
+  fd = bufferevent_getfd(bev);
+  __write_buffer = bufferevent_get_output(bev);
+
+  si->ui.__write_cb(fd, (void*)__write_buffer);
+}
+
+void
+net_event_error(struct bufferevent* bev, short error, void* args) {
+  evutil_socket_t fd;
+
+  fd = bufferevent_getfd(bev);
+
+  if(error & BEV_EVENT_EOF) {
+    /* connection has been closed, do any clean up here */
+  } else if(error & BEV_EVENT_ERROR) {
+    /* check errno to see what error occurred */
+  } else if(error & BEV_EVENT_TIMEOUT) {
+    /* must be a timeout event handle, handle it */
   }
 
-  event_add(ne->ev_read, NULL);
-
-  si->ui.__accept_cb(fd, (struct sockaddr_in*)&ss, NULL);
-}
-
-void
-net_event_read(evutil_socket_t fd, short events, void* args) {
-  struct service_init* si;
-
-  si = (struct service_init*)args;
-
-  si->ui.__read_cb(fd, NULL);
-}
-
-void
-net_event_write(evutil_socket_t fd, short events, void* args) {
-  struct service_init* si;
-
-  si = (struct service_init*)args;
-  
-  si->ui.__write_cb(fd, NULL);
+  net_socket_close(fd);
+  bufferevent_free(bev);
 }
 
 struct event*
@@ -161,9 +180,3 @@ int
 net_event_reset(struct event* e, struct event_base* eb, evutil_socket_t fd, short events, event_cb cb, void* arg) {
   return event_assign(e, eb, fd, events, cb, arg);
 }
-
-const struct net_rw_event*
-net_service_get_evnets(evutil_socket_t fd) {
-  return &net_events[fd];
-}
-
