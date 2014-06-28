@@ -11,9 +11,11 @@
 
 void
 on_accept(evutil_socket_t fd, struct sockaddr_in* sin, void* args) {
-  const char* connection_ip;
-  struct service_init* si;
+  int len;
+  char buf[32];
   net_session* session;
+  struct about_crypt* ac;
+  const char* connection_ip;
 
   connection_ip = inet_ntoa(sin->sin_addr);
   printf("accept connection[socket:%d][ip:%s][port:%d].\n", fd, connection_ip, sin->sin_port);
@@ -22,6 +24,10 @@ on_accept(evutil_socket_t fd, struct sockaddr_in* sin, void* args) {
   if(session) {
     session->set_socket(fd);
     session_manager::instance()->insert_session(fd, session);
+
+    ac = session->get_crypt();
+    len = send_key(ac, buf, sizeof(buf));
+
   } else {
     printf("%s : can't find one free session\n", __FUNCTION__);
     return;
@@ -34,24 +40,40 @@ on_read(evutil_socket_t fd, void* args) {
   ring_buffer* rb;
   net_session* session;
   net_message* message;
+  struct about_crypt* ac;
   unsigned short message_len;
 
   session = session_manager::instance()->get_one_session(fd);
   if(session) {
     rb = session->get_rb();
+    ac = session->get_crypt();
     len = net_socket_recv(fd, rb->write_p(), rb->available());
     if(len > 0) {
       rb->seek_write(len);
 
       do
       {
-        message_len = session->peek_message_size();
+        len = session->preread_message_size((char*)&message_len, sizeof(message_len));
+        if(len < sizeof(message_len)) {
+          break;
+        }
 
-        transform_buffer_to_message(message, rb->read_p(), message_len);
+        message_len ^= (ac->session_key & 0x0000ffff);
+        if(message_len > rb->used()) {
+          break;
+        }
 
+        message = new net_message();
+        if(0 == message) {
+          printf("on_read: malloc message failed!\n");
+          break;
+        }
+
+        transform_buffer_to_message(ac, message, rb->read_p(), message_len);
         rb->seek_read(message_len);
+        session->push_to_readqueue(message);
 
-      }while(rb->used() >= message_len);
+      }while(true);
     
     } else {
 
@@ -69,15 +91,17 @@ on_write(evutil_socket_t fd, void* args) {
   ring_buffer* wb;
   net_session* session;
   net_message* message;
+  struct about_crypt* ac;
 
   session = session_manager::instance()->get_one_session(fd);
   if(session) {
     wb = session->get_wb();
+    ac = session->get_crypt();
     do 
     {
       ret = session->fetch_from_writequeue(message);
       if(ret) {
-        len = transform_message_to_buffer(message, wb->write_p(), message->get_real_size());
+        len = transform_message_to_buffer(ac, message, wb->write_p(), message->get_real_size());
         if(len > 0) {
           wb->seek_write(len);
         }
@@ -106,7 +130,7 @@ main(int argc, char* argv[]) {
 
 #ifdef WIN32
   WSADATA wsaData;
-  if (WSAStartup(MAKEWORD(2,2), &wsaData) != NO_ERROR)
+  if(WSAStartup(MAKEWORD(2,2), &wsaData) != NO_ERROR)
     printf("Error at WSAStartup()\n");
 #endif
 
@@ -123,6 +147,8 @@ main(int argc, char* argv[]) {
     return -1;
   }
 
+  initial_xor_keys();
+  initial_crc32_table();
   session_manager::create_singleton();
   session_manager::instance()->init_sessions();
 

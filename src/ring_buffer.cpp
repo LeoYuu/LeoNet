@@ -13,7 +13,7 @@ ring_buffer::ring_buffer(int buf_size)
 
 ring_buffer::~ring_buffer()
 {
-  if (__ring_buffer)
+  if(__ring_buffer)
     delete[] __ring_buffer;
 
   __ring_buffer = NULL;

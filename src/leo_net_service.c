@@ -109,8 +109,6 @@ net_event_accept(evutil_socket_t listen_fd, short events, void* args) {
     if(!ne->ev_read || !ne->ev_write) {
       ne->ev_read ? free(ne->ev_read) : 0;
       ne->ev_write ? free(ne->ev_write) : 0;
-      free(ne);
-      ne = 0;
     }
   }
 

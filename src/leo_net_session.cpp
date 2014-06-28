@@ -58,7 +58,7 @@ session_manager::~session_manager()
   __malloc_session = NULL;
 }
 
-BOOL session_manager::init_sessions()
+bool session_manager::init_sessions()
 {
   __malloc_session = new net_session[MAX_SESSION];
   if(__malloc_session)
@@ -67,9 +67,10 @@ BOOL session_manager::init_sessions()
     {
       __vct_sessions.push_back(&__malloc_session[i]);
     }
+    return true;
   }
 
-  return FALSE;
+  return false;
 }
 
 net_session* session_manager::claim_one_session()
@@ -97,7 +98,7 @@ void session_manager::reclaim_one_session(net_session* session)
   session = NULL;
 }
 
-BOOL session_manager::insert_session(int socket, net_session* session)
+bool session_manager::insert_session(int socket, net_session* session)
 {
   assert(socket > 0 && session);
 
@@ -106,16 +107,16 @@ BOOL session_manager::insert_session(int socket, net_session* session)
   {
     __map_sessions.insert(std::make_pair<int, net_session*>(socket, session));
 
-    return TRUE;
+    return true;
   }
   else
   {
     printf("session-manager: insert session error[exist].");
-    return FALSE;
+    return false;
   }
 }
 
-BOOL session_manager::remove_session(int socket)
+bool session_manager::remove_session(int socket)
 {
   assert(socket > 0);
 
@@ -123,12 +124,12 @@ BOOL session_manager::remove_session(int socket)
   if(map_iter == __map_sessions.end())
   {
     printf("session-manager: remove session error[inexist].");
-    return FALSE;
+    return false;
   }
   else
   {
     __map_sessions.erase(map_iter);
-    return TRUE;
+    return true;
   }
 }
 

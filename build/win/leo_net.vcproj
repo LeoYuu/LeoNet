@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libevent_core_debug.lib ws2_32.lib leo_net_base.lib leo_utilities.lib leo_protocols.lib"
+				AdditionalDependencies="libevent_core_debug.lib ws2_32.lib leo_net_base.lib leo_utilities.lib leo_protocols.lib leo_encrypt.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../libs/win/"
 				IgnoreAllDefaultLibraries="false"
