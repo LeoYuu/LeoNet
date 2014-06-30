@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="leo_net_base"
+	Name="leo_net_core"
 	ProjectGUID="{EE830459-1ED7-4C4D-AAC1-568EE8DB4122}"
 	RootNamespace="leo_net_base"
 	Keyword="Win32Proj"
