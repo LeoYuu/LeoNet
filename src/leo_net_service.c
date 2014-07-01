@@ -71,18 +71,74 @@ net_socket_tcpnodely(evutil_socket_t fd) {
   return 1;
 }
 
+int
+net_service_create(struct service_init* si) {
+  struct event* e;
+  unsigned short port;
+  unsigned int backlog;
+  evutil_socket_t listen_fd;
+
+  port = si->ssi._port;
+  backlog = si->ssi._backlog;
+
+  listen_fd = net_socket_open();
+  if(-1 == listen_fd) {
+    return -1;
+  }
+
+  si->eb = net_core_create();
+  if(NULL == si->eb) {
+    return -1;
+  }
+
+  e = net_event_create(si->eb, listen_fd, EV_READ | EV_PERSIST, server_event_accept, &si);
+  if(NULL == e) {
+    return -1;
+  }
+
+  if(net_socket_bind(listen_fd, port) < 0) {
+    return -1;
+  }
+
+  if(net_socket_listen(listen_fd, backlog) < 0) {
+    return -1;
+  }
+
+  if(net_socket_nonblocking(listen_fd) < 0) {
+    return -1;
+  }
+
+  if(net_socket_reuseaddr(listen_fd) < 0) {
+    return -1;
+  }
+
+  event_add(e, NULL);
+
+  return 0;
+}
+
+int
+net_service_release(struct service_init* si) {
+  return 0;
+}
+
 struct event_base*
-net_service_create() {
+net_core_create() {
   return event_base_new();
 }
 
 void
-net_service_release(struct event_base* eb) {
+net_core_release(struct event_base* eb) {
   event_base_free(eb);
 }
 
+int
+net_core_loop(struct event_base* eb) {
+  return event_base_dispatch(eb);
+}
+
 void
-net_event_accept(evutil_socket_t listen_fd, short events, void* args) {
+server_event_accept(evutil_socket_t listen_fd, short events, void* args) {
   int slen;
   evutil_socket_t fd;
   struct bufferevent* bev;
@@ -101,17 +157,17 @@ net_event_accept(evutil_socket_t listen_fd, short events, void* args) {
 
   bev = bufferevent_socket_new(si->eb, fd, BEV_OPT_CLOSE_ON_FREE);
   if(bev) {
-    bufferevent_setcb(bev, net_event_read, net_event_write, net_event_error, args);
+    bufferevent_setcb(bev, server_event_read, server_event_write, server_event_error, args);
     bufferevent_enable(bev, EV_READ | EV_WRITE);
 
-    si->ui.__accept_cb(fd, (struct sockaddr_in*)&ss, (void*)bev);
+    si->sui._accept_cb(fd, (struct sockaddr_in*)&ss, (void*)bev);
   } else {
 
   }
 }
 
 void
-net_event_read(struct bufferevent* bev, void* args) {
+server_event_read(struct bufferevent* bev, void* args) {
   evutil_socket_t fd;
   struct service_init* si;
   struct evbuffer* __read_buffer;
@@ -121,11 +177,11 @@ net_event_read(struct bufferevent* bev, void* args) {
   fd = bufferevent_getfd(bev);
   __read_buffer = bufferevent_get_input(bev);
 
-  si->ui.__read_cb(fd, (void*)__read_buffer);
+  si->sui._read_cb(fd, (void*)__read_buffer);
 }
 
 void
-net_event_write(struct bufferevent* bev, void* args) {
+server_event_write(struct bufferevent* bev, void* args) {
   evutil_socket_t fd;
   struct service_init* si;
   struct evbuffer* __write_buffer;
@@ -135,11 +191,11 @@ net_event_write(struct bufferevent* bev, void* args) {
   fd = bufferevent_getfd(bev);
   __write_buffer = bufferevent_get_output(bev);
 
-  si->ui.__write_cb(fd, (void*)__write_buffer);
+  si->sui._write_cb(fd, (void*)__write_buffer);
 }
 
 void
-net_event_error(struct bufferevent* bev, short error, void* args) {
+server_event_error(struct bufferevent* bev, short error, void* args) {
   evutil_socket_t fd;
 
   fd = bufferevent_getfd(bev);
@@ -179,4 +235,50 @@ net_event_del(struct event* e) {
 int
 net_event_reset(struct event* e, struct event_base* eb, evutil_socket_t fd, short events, event_cb cb, void* arg) {
   return event_assign(e, eb, fd, events, cb, arg);
+}
+
+int
+net_client_create(struct client_init* ci) {
+  int ret;
+  evutil_socket_t fd;
+  struct bufferevent* bev;
+
+  fd = net_socket_open();
+  if(fd < 0) {
+    return -1;
+  }
+
+  bev = bufferevent_socket_new(ci->eb, fd, BEV_OPT_CLOSE_ON_FREE);
+  if(0 == bev) {
+    return -1;
+  }
+
+  bufferevent_setcb(bev, client_event_read, client_event_write, client_event_connect, (void*)ci);
+
+  ret = bufferevent_socket_connect(bev, (struct sockaddr*)&(ci->csi.sin), sizeof(struct sockaddr_in));
+  if(ret < 0) {
+    return -1;
+  }
+
+  return 0;
+}
+
+int
+net_client_release(struct client_init* ci) {
+  return 0;
+}
+
+void
+client_event_connect(struct bufferevent* bev, short events, void* args) {
+  int i = 0;
+}
+
+void
+client_event_read(struct bufferevent* bev, void* args) {
+  int i = 0;
+}
+
+void
+client_event_write(struct bufferevent* bev, void* args) {
+  int i = 0;
 }

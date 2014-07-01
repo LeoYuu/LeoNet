@@ -117,9 +117,8 @@ on_write(evutil_socket_t fd, void* args) {
 
 int
 main(int argc, char* argv[]) {
-  struct event* e;
+  struct client_init ci;
   struct service_init si;
-  evutil_socket_t listen_fd;
 
 #ifdef WIN32
   WSADATA wsaData;
@@ -127,40 +126,37 @@ main(int argc, char* argv[]) {
     printf("Error at WSAStartup()\n");
 #endif
 
-  listen_fd = net_socket_open();
-  if(-1 == listen_fd) {
-    return -1;
-  }
-
-  if(net_socket_bind(listen_fd, PORT) < 0) {
-    return -1;
-  }
-
-  if(net_socket_listen(listen_fd, BACKLOG) < 0) {
-    return -1;
-  }
-
   initial_xor_keys();
   initial_crc32_table();
   session_manager::create_singleton();
   session_manager::instance()->init_sessions();
+/*
+  si.ssi._port = PORT;
+  si.ssi._backlog = BACKLOG;
+  si.sui._accept_cb = on_accept;
+  si.sui._read_cb = on_read;
+  si.sui._write_cb = on_write;
 
-  si.ui.__accept_cb = on_accept;
-  si.ui.__read_cb = on_read;
-  si.ui.__write_cb = on_write;
+  if(net_service_create(&si) < 0) {
+    return -1;
+  }
+*/
 
-  si.eb = net_service_create();
-  if(NULL == si.eb) {
+  memset(&ci.csi.sin, 0, sizeof(struct sockaddr_in));
+  ci.csi.sin.sin_family = AF_INET;
+  ci.csi.sin.sin_addr.s_addr = inet_addr("192.168.8.80");
+  ci.csi.sin.sin_port = htons(PORT);
+  
+  ci.eb = net_core_create();
+  if(0 == ci.eb) {
     return -1;
   }
 
-  e = net_event_create(si.eb, listen_fd, EV_READ | EV_PERSIST, net_event_accept, &si);
-  if(NULL == e) {
+  if(net_client_create(&ci) < 0) {
     return -1;
   }
 
-  event_add(e, NULL);
-  event_base_dispatch(si.eb);
+  net_core_loop(ci.eb);
 
 #ifdef WIN32
   WSACleanup();
