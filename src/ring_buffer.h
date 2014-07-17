@@ -3,62 +3,20 @@
 
 #include "leo_utilities.h"
 
-#if defined WIN32
-# include <assert.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <memory.h>
+
+#ifdef WIN32
 # include <windows.h>
 # define mb() MemoryBarrier()
 # define rmb() MemoryBarrier()
 # define wmb() MemoryBarrier()
-#elif defined __LINUX__
-# define __ASM_FORM(x)  " " #x " "
-# define __ASM_SEL(a,b) __ASM_FORM(a)
-
-# define _ASM_ALIGN  __ASM_SEL(.balign 4, .balign 8)
-# define _ASM_PTR  __ASM_SEL(.long, .quad)
-# define __stringify_1(x...)  #x
-# define __stringify(x...)  __stringify_1(x)
-
-# define ALTERNATIVE(oldinstr, newinstr, feature)      \
-  \
-  "661:\n\t" oldinstr "\n662:\n"          \
-  ".section .altinstructions,\"a\"\n"        \
-  _ASM_ALIGN "\n"              \
-  _ASM_PTR "661b\n"        /* label           */  \
-  _ASM_PTR "663f\n"        /* new instruction */  \
-  "   .byte " __stringify(feature) "\n"  /* feature bit     */  \
-  "   .byte 662b-661b\n"      /* sourcelen       */  \
-  "   .byte 664f-663f\n"      /* replacementlen  */  \
-  ".previous\n"              \
-  ".section .altinstr_replacement, \"ax\"\n"      \
-  "663:\n\t" newinstr "\n664:\n"    /* replacement     */  \
-  ".previous"
-
-# define alternative(oldinstr, newinstr, feature) \
-  asm volatile (ALTERNATIVE(oldinstr, newinstr, feature) : : : "memory")
-
-# define X86_FEATURE_XMM    (0*32+25) /* "sse" */
-# define X86_FEATURE_XMM2  (0*32+26) /* "sse2" */  
-
-/*
-* Force strict CPU ordering.
-* And yes, this is required on UP too when we're talking
-* to devices.
-*/
-
-//#if defined CONFIG_X86_32
-/*
-* Some non-Intel clones support out of order store. wmb() ceases to be a
-* nop for these.
-*/
-//#define mb() alternative("lock; addl $0,0(%%esp)", "mfence", X86_FEATURE_XMM2)
-//#define rmb() alternative("lock; addl $0,0(%%esp)", "lfence", X86_FEATURE_XMM2)
-//#define wmb() alternative("lock; addl $0,0(%%esp)", "sfence", X86_FEATURE_XMM)
-//#else
+#else
 # define mb() asm volatile("mfence":::"memory")
 # define rmb() asm volatile("lfence":::"memory")
 # define wmb() asm volatile("sfence" ::: "memory")
-//#endif // CONFIG_X86_32
-#endif // #if defined __linux__
+#endif
 
 #define smp_mb() mb()
 #define smp_rmb() rmb()
@@ -95,7 +53,7 @@ public:
 
   inline bool full() const
   {
-    return __buffer_size == used();
+    return __buffer_size == (int)used(); /* Ïû³ý¾¯¸æ */
   }
 
   inline char* write_p()

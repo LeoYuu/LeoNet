@@ -33,9 +33,9 @@ struct about_crypt
 
 LEO_EXPORT int send_key(struct about_crypt* ac, char* buf);
 
-LEO_EXPORT int transform_message_to_buffer(struct about_crypt* ac, net_message* nm, char* buf, int len);
+LEO_EXPORT int transform_message_to_buffer(struct about_crypt* ac, net_message* nm, char* buf, unsigned int len);
 
-LEO_EXPORT int transform_buffer_to_message(struct about_crypt* ac, net_message* nm, char* buf, int len);
+LEO_EXPORT int transform_buffer_to_message(struct about_crypt* ac, net_message* nm, char* buf, unsigned int len);
 
 #ifdef __cplusplus
 }

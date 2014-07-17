@@ -8,6 +8,7 @@
 
 unsigned long keys[16][2];
 
+/* 该函数未引用, 为了消除警告, 暂时注释之
 static void 
 des_setparity(char* key) {
   int n;
@@ -21,7 +22,7 @@ des_setparity(char* key) {
     c ^= c << 1;
     *key++ ^= ~c & 0x80;
   }
-}
+}*/ 
 
 void 
 des_setkey(const char* key) {

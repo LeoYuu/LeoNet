@@ -30,7 +30,7 @@ send_key(struct about_crypt* ac, char* buf) {
 
 /* len:id:size:data */
 int 
-transform_message_to_buffer(struct about_crypt* ac, net_message* nm, char* buf, int buf_len) {
+transform_message_to_buffer(struct about_crypt* ac, net_message* nm, char* buf, unsigned int buf_len) {
   unsigned int len, data_size;
 
   data_size = nm->get_real_size();
@@ -53,7 +53,7 @@ transform_message_to_buffer(struct about_crypt* ac, net_message* nm, char* buf, 
 
 /* len:sequence:id:size:data:crc32 */
 int
-transform_buffer_to_message(struct about_crypt* ac, net_message* nm, char* buf, int msg_len) {
+transform_buffer_to_message(struct about_crypt* ac, net_message* nm, char* buf, unsigned int msg_len) {
   unsigned int sequence_id, bp = 0;
 
   xor_decrypt(buf + sizeof(unsigned short), msg_len, ac->xor_key);
