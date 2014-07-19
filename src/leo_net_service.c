@@ -260,6 +260,8 @@ net_client_create(struct client_init* ci) {
     return -1;
   }
 
+  bufferevent_enable(bev , EV_READ);
+
   return 0;
 }
 
@@ -270,15 +272,38 @@ net_client_release(struct client_init* ci) {
 
 void
 client_event_connect(struct bufferevent* bev, short events, void* args) {
-  
+  evutil_socket_t fd;
+  struct client_init* ci = (struct client_init*)args;
+
+  fd = bufferevent_getfd(bev);
+
+  ci->cui._connect_cb(fd, events);
 }
 
 void
 client_event_read(struct bufferevent* bev, void* args) {
+  evutil_socket_t fd;
+  struct client_init* ci;
+  struct evbuffer* __read_buffer;
 
+  ci = (struct client_init*)args;
+
+  fd = bufferevent_getfd(bev);
+  __read_buffer = bufferevent_get_input(bev);
+
+  ci->cui._read_cb(fd, (void*)__read_buffer);
 }
 
 void
 client_event_write(struct bufferevent* bev, void* args) {
+  evutil_socket_t fd;
+  struct client_init* ci;
+  struct evbuffer* __write_buffer;
 
+  ci = (struct client_init*)args;
+
+  fd = bufferevent_getfd(bev);
+  __write_buffer = bufferevent_get_output(bev);
+
+  ci->cui._write_cb(fd, (void*)__write_buffer);
 }

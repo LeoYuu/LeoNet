@@ -27,20 +27,25 @@
 extern "C" {
 #endif
 
-typedef void(* accept_cb)(evutil_socket_t, struct sockaddr_in*, void*);
+typedef void(* conn_cb)(evutil_socket_t, short);
 typedef void(* read_cb)(evutil_socket_t, void*);
 typedef void(* write_cb)(evutil_socket_t, void*);
 typedef void(* event_cb)(evutil_socket_t, short, void*);
+typedef void(* accept_cb)(evutil_socket_t, struct sockaddr_in*, void*);
 
 struct client_user_init{
   read_cb _read_cb;
   write_cb _write_cb;
+  conn_cb _connect_cb;
 };
 
 struct client_system_init{
   struct sockaddr_in sin;
 };
 
+ /* 
+ * 作为client时的初始化结构 
+ */
 struct client_init{
   struct event_base* eb;
   struct client_user_init cui;
@@ -58,12 +63,14 @@ struct server_system_init{
   unsigned int _backlog;
 };
 
+ /* 
+ * 作为server时的初始化结构 
+ */
 struct service_init{
   struct event_base* eb;
   struct server_user_init sui;
   struct server_system_init ssi;
 };
-
 
 /* open & close socket */
 LEO_EXPORT evutil_socket_t net_socket_open();

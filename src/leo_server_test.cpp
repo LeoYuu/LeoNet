@@ -117,7 +117,6 @@ on_write(evutil_socket_t fd, void* args) {
 
 int
 main(int argc, char* argv[]) {
-  struct client_init ci;
   struct service_init si;
 
 #ifdef WIN32
@@ -130,33 +129,23 @@ main(int argc, char* argv[]) {
   initial_crc32_table();
   session_manager::create_singleton();
   session_manager::instance()->init_sessions();
-/*
+
   si.ssi._port = PORT;
   si.ssi._backlog = BACKLOG;
   si.sui._accept_cb = on_accept;
   si.sui._read_cb = on_read;
   si.sui._write_cb = on_write;
 
+  si.eb = net_core_create();
+  if(0 == si.eb) {
+    return -1;
+  }
+
   if(net_service_create(&si) < 0) {
     return -1;
   }
-*/
 
-  memset(&ci.csi.sin, 0, sizeof(struct sockaddr_in));
-  ci.csi.sin.sin_family = AF_INET;
-  ci.csi.sin.sin_addr.s_addr = inet_addr("192.168.8.80");
-  ci.csi.sin.sin_port = htons(PORT);
-  
-  ci.eb = net_core_create();
-  if(0 == ci.eb) {
-    return -1;
-  }
-
-  if(net_client_create(&ci) < 0) {
-    return -1;
-  }
-
-  net_core_loop(ci.eb);
+  net_core_loop(si.eb);
 
 #ifdef WIN32
   WSACleanup();
