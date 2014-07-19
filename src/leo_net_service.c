@@ -31,7 +31,7 @@ net_socket_listen(evutil_socket_t fd, int backlog) {
 }
 
 int
-net_socket_recv(evutil_socket_t fd, char* buf, int len) {
+net_socket_recv(evutil_socket_t fd, void* buf, ev_ssize_t len) {
   int n = 0;
 #ifdef WIN32
   n = recv(fd, buf, len, 0);
@@ -42,7 +42,7 @@ net_socket_recv(evutil_socket_t fd, char* buf, int len) {
 }
 
 int
-net_socket_send(evutil_socket_t fd, char* buf, int len) {
+net_socket_send(evutil_socket_t fd, const void* buf, ev_ssize_t len) {
   int n = 0;
 #ifdef WIN32
   n = send(fd, buf, len, 0);
@@ -139,7 +139,7 @@ net_core_loop(struct event_base* eb) {
 
 void
 server_event_accept(evutil_socket_t listen_fd, short events, void* args) {
-  int slen;
+  ev_socklen_t slen;
   evutil_socket_t fd;
   struct bufferevent* bev;
   struct service_init* si;
@@ -270,15 +270,15 @@ net_client_release(struct client_init* ci) {
 
 void
 client_event_connect(struct bufferevent* bev, short events, void* args) {
-  int i = 0;
+  
 }
 
 void
 client_event_read(struct bufferevent* bev, void* args) {
-  int i = 0;
+
 }
 
 void
 client_event_write(struct bufferevent* bev, void* args) {
-  int i = 0;
+
 }

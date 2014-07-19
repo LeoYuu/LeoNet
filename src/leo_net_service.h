@@ -1,6 +1,18 @@
 #ifndef __LEO_NET_SERVICE_H__
 #define __LEO_NET_SERVICE_H__
 
+#include <stdio.h>
+#include <stdlib.h>
+
+#ifndef WIN32
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/unistd.h>
+#include <netinet/in.h>
+#include <linux/tcp.h>
+#endif
+
+#include "event2/util.h"
 #include "event2/event.h"
 #include "event2/buffer.h"
 #include "event2/bufferevent.h"
@@ -62,8 +74,8 @@ LEO_EXPORT int net_socket_bind(evutil_socket_t fd, short port);
 LEO_EXPORT int net_socket_listen(evutil_socket_t fd, int backlog);
  
 /* read & write on socket */
-LEO_EXPORT int net_socket_recv(evutil_socket_t fd, char* buf, int len);
-LEO_EXPORT int net_socket_send(evutil_socket_t fd, char* buf, int len);
+LEO_EXPORT int net_socket_recv(evutil_socket_t fd, void* buf, ev_ssize_t len);
+LEO_EXPORT int net_socket_send(evutil_socket_t fd, const void* buf, ev_ssize_t len);
  
 /* socket settings */
 LEO_EXPORT int net_socket_tcpnodely(evutil_socket_t fd);
