@@ -91,7 +91,7 @@ net_service_create(struct service_init* si) {
     return -1;
   }
 
-  e = net_event_create(si->eb, listen_fd, EV_READ | EV_PERSIST, server_event_accept, &si);
+  e = net_event_create(si->eb, listen_fd, EV_READ | EV_PERSIST, server_event_accept, si);
   if(NULL == e) {
     return -1;
   }

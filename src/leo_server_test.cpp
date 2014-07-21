@@ -63,7 +63,7 @@ on_read(evutil_socket_t fd, void* args) {
     do 
     {
       len = pre_read(read_buffer, (void*)&message_len, sizeof(message_len));
-      if(len < (sizeof(message_len))) {
+      if(len < (int)sizeof(message_len)) {
         break;
       }
 

@@ -46,7 +46,7 @@ main(int argc, char* argv[]) {
 
   memset(&ci.csi.sin, 0, sizeof(struct sockaddr_in));
   ci.csi.sin.sin_family = AF_INET;
-  ci.csi.sin.sin_addr.s_addr = inet_addr("10.8.200.30");
+  ci.csi.sin.sin_addr.s_addr = inet_addr("127.0.0.1");
   ci.csi.sin.sin_port = htons(PORT);
   ci.cui._connect_cb = on_connect;
   ci.cui._read_cb = on_read;
