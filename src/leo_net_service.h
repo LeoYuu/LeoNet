@@ -9,7 +9,8 @@
 #include <sys/socket.h>
 #include <sys/unistd.h>
 #include <netinet/in.h>
-#include <linux/tcp.h>
+#include <netinet/tcp.h>
+#include <arpa/inet.h>
 #endif
 
 #include "event2/util.h"

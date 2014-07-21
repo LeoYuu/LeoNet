@@ -1,17 +1,16 @@
 #include <stdio.h>
-#include <WinSock2.h>
+#include <stdlib.h>
 
-#include "util.h"
+#ifdef WIN32
+#include <WinSock2.h>
+#endif
+
 #include "leo_net_service.h"
 #include "leo_net_session.h"
 #include "leo_tcp_game_protocol.h"
 
 #define PORT 6000
 #define BACKLOG 100
-
-static ev_ssize_t pre_read(struct evbuffer* rb, void* buf, size_t len) {
-  return evbuffer_copyout(rb, buf, len);
-}
 
 void
 on_read(evutil_socket_t fd, void* args) {

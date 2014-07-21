@@ -1,7 +1,10 @@
 #include <stdio.h>
-#include <WinSock2.h>
+#include <stdlib.h>
 
-#include "util.h"
+#ifdef WIN32
+#include <WinSock2.h>
+#endif
+
 #include "leo_net_service.h"
 #include "leo_net_session.h"
 #include "leo_tcp_game_protocol.h"
