@@ -6,8 +6,11 @@ INC_PATH := ../../include
 LIB_PATH := ../../libs/linux
 BIN_PATH := ../../bin
 
+3RD_LIB_PATH := ../../3rd/libs/linux
+LIBEVENT_INC_PATH := ../../3rd/libevent/include
+
 SHARED = -fPIC --shared
-CFLAGS = -g -O2 -Wall -I$(INC_PATH) -L$(LIB_PATH)
+CFLAGS = -g -O2 -Wall -I$(INC_PATH) -I$(LIBEVENT_INC_PATH) -L$(LIB_PATH) -L$(3RD_LIB_PATH)
 
 all : $(LIB_PATH)/libnet.so $(LIB_PATH)/libencrypt.so \
 	$(LIB_PATH)/libprotocols.so $(LIB_PATH)/libutilities.so \
