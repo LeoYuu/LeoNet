@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="leo_net_core"
-	ProjectGUID="{EE830459-1ED7-4C4D-AAC1-568EE8DB4122}"
-	RootNamespace="leo_net_base"
+	Name="leo_server_test"
+	ProjectGUID="{95B576E2-BDE6-4212-BA53-A59AE5A4A13E}"
+	RootNamespace="leo_server_test"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -18,9 +18,9 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\..\libs\win"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			OutputDirectory="..\..\bin"
+			IntermediateDirectory="debug"
+			ConfigurationType="1"
 			CharacterSet="2"
 			>
 			<Tool
@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../../3rd/libevent/include;../../3rd/libevent/include/event2"
-				PreprocessorDefinitions="WIN32;_DEBUG;_BUILD_DLL"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -61,11 +61,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libevent_core_debug.lib ws2_32.lib"
+				AdditionalDependencies="libevent_core_debug.lib ws2_32.lib leo_net_core.lib leo_utilities.lib leo_protocols.lib leo_encrypt.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="../../3rd/libs/win/"
+				AdditionalLibraryDirectories="../../libs/win/;../../3rd/libs/win"
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				SubSystem="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -94,7 +94,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -117,7 +117,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LEO_NET_BASE_EXPORTS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -137,7 +137,7 @@
 				Name="VCLinkerTool"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -174,7 +174,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\src\leo_net_service.c"
+				RelativePath="..\..\src\leo_net_message.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\leo_net_session.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\leo_server_test.cpp"
 				>
 			</File>
 		</Filter>
@@ -184,7 +192,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\src\leo_net_service.h"
+				RelativePath="..\..\src\leo_net_message.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\leo_net_session.h"
 				>
 			</File>
 		</Filter>
