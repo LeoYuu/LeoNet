@@ -57,6 +57,7 @@ struct server_user_init{
   read_cb _read_cb;
   write_cb _write_cb;
   accept_cb _accept_cb;
+  event_cb _error_cb;
 };
 
 struct server_system_init{

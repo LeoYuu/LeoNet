@@ -197,16 +197,12 @@ server_event_write(struct bufferevent* bev, void* args) {
 void
 server_event_error(struct bufferevent* bev, short error, void* args) {
   evutil_socket_t fd;
+  struct service_init* si;
 
   fd = bufferevent_getfd(bev);
+  si = (struct service_init*)args;
 
-  if(error & BEV_EVENT_EOF) {
-    /* connection has been closed, do any clean up here */
-  } else if(error & BEV_EVENT_ERROR) {
-    /* check errno to see what error occurred */
-  } else if(error & BEV_EVENT_TIMEOUT) {
-    /* must be a timeout event handle, handle it */
-  }
+  si->sui._error_cb(fd, error, args);
 
   net_socket_close(fd);
   bufferevent_free(bev);

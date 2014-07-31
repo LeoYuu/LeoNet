@@ -48,6 +48,19 @@ on_accept(evutil_socket_t fd, struct sockaddr_in* sin, void* args) {
 }
 
 void
+on_error(evutil_socket_t fd, short error, void* args)
+{
+  if(error & BEV_EVENT_EOF) {
+    /* connection has been closed, do any clean up here */
+    printf("close connection!\n");
+  } else if(error & BEV_EVENT_ERROR) {
+    /* check errno to see what error occurred */
+  } else if(error & BEV_EVENT_TIMEOUT) {
+    /* must be a timeout event handle, handle it */
+  }
+}
+
+void
 on_read(evutil_socket_t fd, void* args) {
   int len;
   char buf[1024 + 64];
@@ -138,6 +151,7 @@ main(int argc, char* argv[]) {
   si.sui._accept_cb = on_accept;
   si.sui._read_cb = on_read;
   si.sui._write_cb = on_write;
+  si.sui._error_cb = on_error;
 
   si.eb = net_core_create();
   if(0 == si.eb) {
