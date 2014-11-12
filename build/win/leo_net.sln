@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "leo_server_test", "leo_serv
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "leo_client_test", "leo_client_test.vcproj", "{97D913DF-044A-4959-8517-CFF710C65B66}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "leo_loginserver", "leo_loginserver.vcproj", "{94CDF964-D326-4961-9740-74BF244B97A3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -43,6 +45,10 @@ Global
 		{97D913DF-044A-4959-8517-CFF710C65B66}.Debug|Win32.Build.0 = Debug|Win32
 		{97D913DF-044A-4959-8517-CFF710C65B66}.Release|Win32.ActiveCfg = Release|Win32
 		{97D913DF-044A-4959-8517-CFF710C65B66}.Release|Win32.Build.0 = Release|Win32
+		{94CDF964-D326-4961-9740-74BF244B97A3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{94CDF964-D326-4961-9740-74BF244B97A3}.Debug|Win32.Build.0 = Debug|Win32
+		{94CDF964-D326-4961-9740-74BF244B97A3}.Release|Win32.ActiveCfg = Release|Win32
+		{94CDF964-D326-4961-9740-74BF244B97A3}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
