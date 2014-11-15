@@ -21,12 +21,12 @@
 extern "C" {
 #endif
 
-LEO_EXPORT int ecb_crypt(const char* key, char* buf, unsigned len, unsigned mode);
-LEO_EXPORT int cbc_crypt(const char* key, char* buf, unsigned len, unsigned mode, char* ivec);
+LEO_EXPORT int leo_ecb_crypt(const char* key, char* buf, unsigned len, unsigned mode);
+LEO_EXPORT int leo_cbc_crypt(const char* key, char* buf, unsigned len, unsigned mode, char* ivec);
 
 /* Not defined by Sun Microsystems - internally used by desbench program */
-void des_setkey(const char* key);
-void des_crypt(char* buf, int flag);
+void leo_des_setkey(const char* key);
+void leo_des_crypt(char* buf, int flag);
 
 #ifdef __cplusplus
 }

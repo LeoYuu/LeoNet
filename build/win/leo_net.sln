@@ -9,8 +9,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "leo_utilities", "leo_utilit
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "leo_net_core", "leo_net_core.vcproj", "{EE830459-1ED7-4C4D-AAC1-568EE8DB4122}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "leo_server_test", "leo_server_test.vcproj", "{95B576E2-BDE6-4212-BA53-A59AE5A4A13E}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "leo_client_test", "leo_client_test.vcproj", "{97D913DF-044A-4959-8517-CFF710C65B66}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "leo_loginserver", "leo_loginserver.vcproj", "{94CDF964-D326-4961-9740-74BF244B97A3}"
@@ -37,10 +35,6 @@ Global
 		{EE830459-1ED7-4C4D-AAC1-568EE8DB4122}.Debug|Win32.Build.0 = Debug|Win32
 		{EE830459-1ED7-4C4D-AAC1-568EE8DB4122}.Release|Win32.ActiveCfg = Release|Win32
 		{EE830459-1ED7-4C4D-AAC1-568EE8DB4122}.Release|Win32.Build.0 = Release|Win32
-		{95B576E2-BDE6-4212-BA53-A59AE5A4A13E}.Debug|Win32.ActiveCfg = Debug|Win32
-		{95B576E2-BDE6-4212-BA53-A59AE5A4A13E}.Debug|Win32.Build.0 = Debug|Win32
-		{95B576E2-BDE6-4212-BA53-A59AE5A4A13E}.Release|Win32.ActiveCfg = Release|Win32
-		{95B576E2-BDE6-4212-BA53-A59AE5A4A13E}.Release|Win32.Build.0 = Release|Win32
 		{97D913DF-044A-4959-8517-CFF710C65B66}.Debug|Win32.ActiveCfg = Debug|Win32
 		{97D913DF-044A-4959-8517-CFF710C65B66}.Debug|Win32.Build.0 = Debug|Win32
 		{97D913DF-044A-4959-8517-CFF710C65B66}.Release|Win32.ActiveCfg = Release|Win32

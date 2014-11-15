@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 
+#include "message_define.h"
 #include "leo_singleton.h"
 #include "leo_net_message.h"
 #include "leo_lock_free_queue.h"
@@ -20,7 +21,7 @@ public:
   virtual ~net_session();
 
 public:
-  void init();
+  void send_message(net_message* nm);
 
 public:
   inline bool push_to_readqueue(net_message* nm)
@@ -28,7 +29,7 @@ public:
     return __read_queue.push_back(nm);
   }
 
-  inline bool fetch_from_readqueue(net_message* nm)
+  inline bool fetch_from_readqueue(net_message*& nm)
   {
     return __read_queue.pop_front(nm);
   }
@@ -38,7 +39,7 @@ public:
     return __write_queue.push_back(nm);
   }
 
-  inline bool fetch_from_writequeue(net_message* nm)
+  inline bool fetch_from_writequeue(net_message*& nm)
   {
     return __write_queue.pop_front(nm);
   }
@@ -54,12 +55,12 @@ public:
     return __socket;
   }
 
-  inline void set_session_id(int id)
+  inline void set_session_id(unsigned int id)
   {
     __session_id = id;
   }
 
-  inline int get_session_id()
+  inline unsigned int get_session_id()
   {
     return __session_id;
   }
@@ -71,16 +72,61 @@ public:
 
 private:
   int __socket;
-  int __session_id;
+  unsigned int __session_id;
   struct about_crypt __crypt;
   static_lock_free_queue<net_message*, MAX_QUEUE_LEN> __read_queue;  /* using by net & logic thread(thread safe). */
   static_lock_free_queue<net_message*, MAX_QUEUE_LEN> __write_queue; /* using by net & logic thread(thread safe). */
 };
 
-typedef std::vector<net_session*> VCTSESSION;
-typedef std::map<int, net_session*> MAPSESSION;
+class client_session : public net_session
+{
+public:
+  client_session();
+  virtual ~client_session();
 
-class session_manager : public leo_singleton<session_manager>
+public:
+
+private:
+
+};
+
+class server_session : public net_session
+{
+public:
+  server_session();
+  virtual ~server_session();
+  typedef void (server_session::*net_callback)(const net_message* nm);
+
+public:
+  void foreach_process_message();
+  void register_all_message_handler();
+  void process_message(net_message* nm);
+
+  /* 消息处理函数 */
+private:
+  void recv_x2x_message_heart(const net_message* nm);
+
+private:
+  inline void register_message_handler(unsigned short _id, net_callback _handler)
+  {
+    if(!__message_handler[_id])
+    {
+      __message_handler[_id] = _handler;
+    }
+    else
+    {
+      assert(false);
+    }
+  }
+
+private:
+  static net_callback __message_handler[max_message];
+};
+
+typedef std::vector<server_session*> VCTSESSION;
+typedef std::map<int, server_session*> MAPSESSION;
+
+class session_manager
 {
 public:
   session_manager();
@@ -90,18 +136,21 @@ public:
   bool init_sessions();
   int generate_session_id();
 
-  net_session* claim_one_session();
-  void reclaim_one_session(net_session* session);
+  server_session* claim_one_session();
+  void reclaim_one_session(server_session* session);
 
-  net_session* get_one_session(int socket);
-  bool insert_session(int socket, net_session* session);
+  server_session* get_one_session(int socket);
+  bool insert_session(int socket, server_session* session);
   bool remove_session(int socket);
 
+public:
+  void dispatch_message();
+
 private:
-  int __session_id;
+  unsigned int __session_id;
   VCTSESSION __vct_sessions;
   MAPSESSION __map_sessions;
-  net_session* __malloc_session;
+  server_session* __malloc_session;
 };
 
 #endif /* __LEO_NET_SESSION_H__ */

@@ -8,4 +8,3 @@
 #endif
 
 #endif /* __LEO_UTILITIES_H__ */
-

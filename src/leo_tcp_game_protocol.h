@@ -1,6 +1,7 @@
 #ifndef __LEO_TPC_GAME_PROTOCOL_H__
 #define __LEO_TPC_GAME_PROTOCOL_H__
 
+#include <assert.h>
 #include <stdlib.h>
 #include "leo_des_crypto.h"
 #include "leo_dof_crypto.h"

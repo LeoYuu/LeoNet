@@ -40,10 +40,22 @@ public:
     return __buffer;
   }
 
+  inline void copy_data(const char* buf, int len)
+  {
+    if(__real_size + len < BUFFER_SIZE)
+    {
+      memcpy(&__buffer[__real_size], buf, len);
+    }
+    else
+    {
+      assert(false);
+    }
+  }
+
   template <typename t>
   t* pop_ptr()
   {
-    t* _t = 0;
+    t* _t = NULL;
     if(__real_size + sizeof(t) < BUFFER_SIZE)
     {
       _t = (t*)&__buffer[__real_size];

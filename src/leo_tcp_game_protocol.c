@@ -1,5 +1,22 @@
 #include "leo_tcp_game_protocol.h"
 
+static void 
+parse_to_message(const char* buf, int len, net_message* nm) {
+  if(NULL == buf || len < 4) {
+    assert(false);
+    return;
+  }
+
+  unsigned short msg_id = *(unsigned short*)buf;
+  unsigned short msg_len = *(unsigned short*)(buf + sizeof(unsigned short));
+
+  assert(msg_len <= BUFFER_SIZE);
+
+  nm->set_id(msg_id);
+  nm->copy_data(buf + (2 * sizeof(unsigned short)), msg_len);
+  nm->set_real_size(msg_len);
+}
+
 int
 send_key(struct about_crypt* ac, char* buf) {
   unsigned int len;
@@ -23,7 +40,7 @@ send_key(struct about_crypt* ac, char* buf) {
   memcpy(buf + len, &sk, sizeof(struct secret_key));
   len += sizeof(struct secret_key);
 
-  ecb_crypt(DEFAULT_ECB, buf, len, DES_ENCRYPT);
+  leo_ecb_crypt(DEFAULT_ECB, buf, len, DES_ENCRYPT);
 
   return len + 2; /* des need */
 }
@@ -57,7 +74,7 @@ transform_buffer_to_message(struct about_crypt* ac, net_message* nm, char* buf, 
   unsigned int sequence_id, bp = 0;
 
   xor_decrypt(buf + sizeof(unsigned short), msg_len, ac->xor_key);
-  if(0 == check_crc32(buf, sizeof(unsigned short) + msg_len)) {
+  if(!check_crc32(buf, sizeof(unsigned short) + msg_len)) {
     return 0;
   }
 
@@ -73,5 +90,8 @@ transform_buffer_to_message(struct about_crypt* ac, net_message* nm, char* buf, 
 
   ac->sequence_id++;
 
+  parse_to_message(buf + bp, msg_len, nm);
+
   return 0;
 }
+

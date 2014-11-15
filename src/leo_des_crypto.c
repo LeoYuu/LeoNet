@@ -25,7 +25,7 @@ des_setparity(char* key) {
 }*/ 
 
 void 
-des_setkey(const char* key) {
+leo_des_setkey(const char* key) {
   static char nshifts[] = { 
     1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1 
   };
@@ -514,7 +514,7 @@ unsigned long Ip_inv_r[] = {
 };
 
 
-void des_crypt(char* block, int flag)
+void leo_des_crypt(char* block, int flag)
 {  
   int i;
   unsigned char *s;
@@ -605,22 +605,22 @@ void des_crypt(char* block, int flag)
   *block++ = (char)r2;
 }
 
-int ecb_crypt(const char* key, char* buf, unsigned len, unsigned mode)
+int leo_ecb_crypt(const char* key, char* buf, unsigned len, unsigned mode)
 {
-  des_setkey(key);
+  leo_des_setkey(key);
   for(len = (len + 7) & ~7; len != 0; buf += 8, len -= 8) {
-    des_crypt(buf, mode & DES_DIRMASK);
+    leo_des_crypt(buf, mode & DES_DIRMASK);
   }
 
   return ((mode & DES_DEVMASK) == DES_SW ? DESERR_NONE : DESERR_NOHWDEVICE);
 }
 
 
-int cbc_crypt(const char* key, char* buf, unsigned len, unsigned mode, char* ivec)
+int leo_cbc_crypt(const char* key, char* buf, unsigned len, unsigned mode, char* ivec)
 {
   char nvec[8];
 
-  des_setkey(key);
+  leo_des_setkey(key);
   switch (mode & DES_DIRMASK) {
   case DES_ENCRYPT:
     for(len = (len + 7) & ~7; len != 0; len -= 8) {
@@ -632,7 +632,7 @@ int cbc_crypt(const char* key, char* buf, unsigned len, unsigned mode, char* ive
       buf[5] ^= ivec[5];
       buf[6] ^= ivec[6];
       buf[7] ^= ivec[7];
-      des_crypt(buf, DES_ENCRYPT);
+      leo_des_crypt(buf, DES_ENCRYPT);
       ivec[0] = *buf++;
       ivec[1] = *buf++;
       ivec[2] = *buf++;
@@ -653,7 +653,7 @@ int cbc_crypt(const char* key, char* buf, unsigned len, unsigned mode, char* ive
       nvec[5] = buf[5];
       nvec[6] = buf[6];
       nvec[7] = buf[7];
-      des_crypt(buf, DES_DECRYPT);
+      leo_des_crypt(buf, DES_DECRYPT);
       *buf++ ^= ivec[0];
       *buf++ ^= ivec[1];
       *buf++ ^= ivec[2];

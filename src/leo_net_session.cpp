@@ -1,10 +1,15 @@
+#include "leo_marco_util.h"
 #include "leo_net_service.h"
 #include "leo_net_session.h"
+
+server_session::net_callback server_session::__message_handler[max_message] = { 0, };
 
 net_session::net_session()
 : __socket(0)
 , __session_id(0)
 {
+  __read_queue.init_queue();
+  __write_queue.init_queue();
   memset(&__crypt, 0, sizeof(__crypt));
 }
 
@@ -12,9 +17,60 @@ net_session::~net_session()
 {
 }
 
-void net_session::init()
+void net_session::send_message(net_message* nm)
+{
+  if(nm)
+  {
+    push_to_writequeue(nm);
+  }
+  else
+  {
+    assert(false);
+  }
+}
+
+server_session::server_session()
 {
 
+}
+
+server_session::~server_session()
+{
+
+}
+
+void server_session::foreach_process_message()
+{
+  net_message* nm = NULL;
+
+  while(fetch_from_readqueue(nm))
+  {
+    process_message(nm);
+  }
+}
+
+void server_session::process_message(net_message* nm)
+{
+  unsigned short _msg_id = nm->get_id();
+
+  if(_msg_id < max_message && NULL != __message_handler[_msg_id])
+  {
+    (this->*__message_handler[_msg_id])(nm);
+
+    SAFE_DELETE(nm);
+  }
+  else
+  {
+    assert(false);
+  }
+}
+
+void server_session::register_all_message_handler()
+{
+#define register_message_handler(id) server_session::register_message_handler(id, &server_session::recv_##id)
+  register_message_handler(x2x_message_heart);
+
+#undef register_message_handler
 }
 
 session_manager::session_manager()
@@ -37,7 +93,7 @@ session_manager::~session_manager()
 
 bool session_manager::init_sessions()
 {
-  __malloc_session = new net_session[MAX_SESSION];
+  __malloc_session = new server_session[MAX_SESSION];
   if(__malloc_session)
   {
     for(int i = 0; i < MAX_SESSION; ++i)
@@ -50,9 +106,9 @@ bool session_manager::init_sessions()
   return false;
 }
 
-net_session* session_manager::claim_one_session()
+server_session* session_manager::claim_one_session()
 {
-  net_session* session = NULL;
+  server_session* session = NULL;
 
   if(__vct_sessions.size())
   {
@@ -63,7 +119,7 @@ net_session* session_manager::claim_one_session()
   return session;
 }
 
-void session_manager::reclaim_one_session(net_session* session)
+void session_manager::reclaim_one_session(server_session* session)
 {
   assert(session);
 
@@ -75,14 +131,14 @@ void session_manager::reclaim_one_session(net_session* session)
   session = NULL;
 }
 
-bool session_manager::insert_session(int socket, net_session* session)
+bool session_manager::insert_session(int socket, server_session* session)
 {
   assert(socket > 0 && session);
 
   MAPSESSION::iterator map_iter = __map_sessions.find(socket);
   if(map_iter == __map_sessions.end())
   {
-    __map_sessions.insert(std::make_pair<int, net_session*>(socket, session));
+    __map_sessions.insert(std::make_pair<int, server_session*>(socket, session));
 
     return true;
   }
@@ -110,11 +166,11 @@ bool session_manager::remove_session(int socket)
   }
 }
 
-net_session* session_manager::get_one_session(int socket)
+server_session* session_manager::get_one_session(int socket)
 {
   assert(socket > 0);
 
-  net_session* session = NULL;
+  server_session* session = NULL;
 
   MAPSESSION::iterator map_iter = __map_sessions.find(socket);
   if(map_iter == __map_sessions.end())
@@ -132,4 +188,20 @@ net_session* session_manager::get_one_session(int socket)
 int session_manager::generate_session_id()
 {
   return ++__session_id;
+}
+
+void session_manager::dispatch_message()
+{
+  server_session* _message = NULL;
+  server_session* _session = NULL;
+
+  for(MAPSESSION::iterator iter = __map_sessions.begin(); iter != __map_sessions.end(); ++iter)
+  {
+    _session = iter->second;
+    if(NULL == _session)
+      continue;
+
+    /* 处理每个session的消息 */
+    _session->foreach_process_message();
+  }
 }

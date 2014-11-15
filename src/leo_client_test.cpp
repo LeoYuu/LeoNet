@@ -12,27 +12,39 @@
 #define PORT 6000
 #define BACKLOG 100
 
+client_session __client_session;
+
 void
-on_read(evutil_socket_t fd, void* args) {
+on_read(evutil_socket_t fd, void* args) 
+{
   
 }
 
 void
-on_write(evutil_socket_t fd, void* args) {
+on_write(evutil_socket_t fd, void* args)
+{
   
 }
 
 void
-on_connect(evutil_socket_t fd, short events) {
-  if(events & BEV_EVENT_CONNECTED) {
+on_connect(evutil_socket_t fd, short events)
+{
+  if(events & BEV_EVENT_CONNECTED)
+  {
     printf("connected!\n");
-  } else if(events & BEV_EVENT_ERROR) {
+
+    
+    int len = recv(fd, 
+  }
+  else if(events & BEV_EVENT_ERROR)
+  {
     printf("connect error.\n");
   }
 }
 
 int
-main(int argc, char* argv[]) {
+main(int argc, char* argv[])
+{
   struct client_init ci;
 
 #ifdef WIN32
@@ -53,11 +65,13 @@ main(int argc, char* argv[]) {
   ci.cui._write_cb = on_write;
 
   ci.eb = net_core_create();
-  if(0 == ci.eb) {
+  if(0 == ci.eb)
+  {
     return -1;
   }
 
-  if(net_client_create(&ci) < 0) {
+  if(net_client_create(&ci) < 0)
+  {
     return -1;
   }
 
