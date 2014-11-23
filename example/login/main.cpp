@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "leo_loginserver.h"
+#include "loginserver.h"
 
 static void 
 sig_handler()

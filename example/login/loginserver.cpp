@@ -1,4 +1,4 @@
-#include "leo_loginserver.h"
+#include "loginserver.h"
 #include "leo_net_service.h"
 
 login_server g_loginserver;
@@ -51,9 +51,6 @@ login_server::~login_server()
 void 
 login_server::start_network()
 {
-  struct bufferevent* pair[2];
-
-  bufferevent_pair_new(, , pair);
   pthread_create(&__thread_id, 0, thread_proc, 0);
 }
 

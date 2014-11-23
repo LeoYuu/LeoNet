@@ -174,11 +174,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\example\login\leo_loginserver.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\leo_net_session.cpp"
+				RelativePath="..\..\example\login\loginserver.cpp"
 				>
 			</File>
 			<File
@@ -189,6 +185,10 @@
 				RelativePath="..\..\example\login\recv_message.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\example\login\server_session.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="include files"
@@ -196,15 +196,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\example\login\leo_loginserver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\leo_net_session.h"
+				RelativePath="..\..\example\login\loginserver.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\example\login\message_define.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\example\login\server_session.h"
 				>
 			</File>
 		</Filter>

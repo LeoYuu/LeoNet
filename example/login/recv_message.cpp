@@ -1,4 +1,4 @@
-#include "leo_net_session.h"
+#include "server_session.h"
 
 void server_session::recv_x2x_message_heart(const net_message* nm)
 {

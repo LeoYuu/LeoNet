@@ -5,8 +5,8 @@
 
 #include "leo_singleton.h"
 #include "leo_net_service.h"
-#include "leo_net_session.h"
 #include "leo_tcp_game_protocol.h"
+#include "server_session.h"
 
 #define PORT 1200
 #define BACKLOG 100
@@ -38,8 +38,6 @@ public:
 private:
   service_init __si;
   pthread_t __thread_id;
-  bufferevent __recv_ctrl_bev;
-  bufferevent __send_ctrl_bev;
   session_manager __session_manager;
 };
 
