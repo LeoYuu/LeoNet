@@ -1,8 +1,18 @@
 #include "thread.h"
 
+static void* thread_proc(void* _ud)
+{
+  thread* __thread = (thread*)_ud;
+  if(__thread)
+  {
+    __thread->to_do();
+  }
+
+  return 0;
+}
+
 thread::thread()
 {
-
 }
 
 thread::~thread()
@@ -10,7 +20,7 @@ thread::~thread()
 
 }
 
-int thread::init(thread_attr* ta)
+int thread::init(thread_attr* _ta, task* _task)
 {
   int status;
   pthread_attr_t _thread_attr;
@@ -21,7 +31,7 @@ int thread::init(thread_attr* ta)
     return -1;
   }
 
-  if(ta->__is_detach)
+  if(_ta->__is_detach)
   {
     status = pthread_attr_setdetachstate(&_thread_attr, PTHREAD_CREATE_DETACHED);
     if(status != 0)
@@ -31,7 +41,7 @@ int thread::init(thread_attr* ta)
     }
   }
 
-  if(ta->__is_setscope)
+  if(_ta->__is_setscope)
   {
     status = pthread_attr_setscope(&_thread_attr, PTHREAD_SCOPE_SYSTEM);
     if(status != 0)
@@ -41,16 +51,11 @@ int thread::init(thread_attr* ta)
     }
   }
 
-  status = pthread_create(&__tid, &_thread_attr, ta->__thread_cd, ta->__ud);
+  set_task(_task);
+
+  status = pthread_create(&__tid, &_thread_attr, thread_proc, this);
   pthread_attr_destroy(&_thread_attr);
   
   return status;
-}
-
-void* work_thread::to_do(void* ud)
-{
-  __task->doing();
-
-  return 0;
 }
 

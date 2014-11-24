@@ -6,14 +6,10 @@
 
 #include "task.h"
 
-typedef void* (_cdecl *thread_cb)(void*);
-
 struct thread_attr
 {
   bool __is_detach;
   bool __is_setscope;
-  thread_cb __thread_cd;
-  void* __ud;
 };
 
 class thread
@@ -23,7 +19,15 @@ public:
   virtual ~thread();
 
 public:
-  int init(thread_attr* ta);
+  int init(thread_attr* _ta, task* _task);
+
+public:
+  int to_do()
+  {
+    __task->doing();
+
+    return 0;
+  }
 
 public:
   int join(void** _value = 0)
@@ -62,21 +66,6 @@ public:
     return __tid;
   }
 
-protected:
-  pthread_t __tid;
-};
-
-
-class work_thread : public thread
-{
-public:
-  work_thread();
-  virtual ~work_thread();
-
-public:
-  void* to_do(void* ud);
-
-public:
   void set_task(task* _task)
   {
     __task = _task;
@@ -84,6 +73,7 @@ public:
 
 protected:
   task* __task;
+  pthread_t __tid;
 };
 
 #endif /* __THREAD_H__ */
