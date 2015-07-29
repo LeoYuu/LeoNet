@@ -53,7 +53,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../3rd/pthread/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_BUILD_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -63,7 +63,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>pthreadVC2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>../../3rd/libs/win;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -91,9 +91,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\ring_buffer.cpp" />
-    <ClCompile Include="..\..\src\sync.cpp" />
-    <ClCompile Include="..\..\src\thread.cpp" />
-    <ClCompile Include="..\..\src\threadpool.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\leo_lock_free_queue.h" />
@@ -101,10 +98,6 @@
     <ClInclude Include="..\..\src\leo_singleton.h" />
     <ClInclude Include="..\..\src\leo_utilities.h" />
     <ClInclude Include="..\..\src\ring_buffer.h" />
-    <ClInclude Include="..\..\src\sync.h" />
-    <ClInclude Include="..\..\src\task.h" />
-    <ClInclude Include="..\..\src\thread.h" />
-    <ClInclude Include="..\..\src\threadpool.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -14,15 +14,6 @@
     <ClCompile Include="..\..\src\ring_buffer.cpp">
       <Filter>source files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\sync.cpp">
-      <Filter>source files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\thread.cpp">
-      <Filter>source files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\threadpool.cpp">
-      <Filter>source files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\leo_lock_free_queue.h">
@@ -38,18 +29,6 @@
       <Filter>include files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\ring_buffer.h">
-      <Filter>include files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\sync.h">
-      <Filter>include files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\task.h">
-      <Filter>include files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\thread.h">
-      <Filter>include files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\threadpool.h">
       <Filter>include files</Filter>
     </ClInclude>
   </ItemGroup>
