@@ -1,38 +1,33 @@
 #ifndef __LEO_NET_SERVICE_H__
 #define __LEO_NET_SERVICE_H__
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#ifndef WIN32
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/unistd.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
-#endif
+#include <functional>
 
 #include "event2/util.h"
 #include "event2/event.h"
 #include "event2/buffer.h"
 #include "event2/bufferevent.h"
 
-#if defined(WIN32) && defined(_BUILD_DLL)
-# define LEO_EXPORT __declspec(dllexport)
-#else
-# define LEO_EXPORT
-#endif
+#include "leo_base_socket.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef void(* conn_cb)(evutil_socket_t, short);
-typedef void(* read_cb)(evutil_socket_t, void*);
-typedef void(* write_cb)(evutil_socket_t, void*);
-typedef void(* event_cb)(evutil_socket_t, short, void*);
-typedef void(* accept_cb)(evutil_socket_t, struct sockaddr_in*, void*);
+//#define C_CALL TRUE
+#ifdef C_CALL
+  typedef void(* conn_cb)(evutil_socket_t, short);
+  typedef void(* read_cb)(evutil_socket_t, void*);
+  typedef void(* write_cb)(evutil_socket_t, void*);
+  typedef void(* error_cb)(evutil_socket_t, short, void*);
+  typedef void(* accept_cb)(evutil_socket_t, struct sockaddr_in*, void*);
+#else
+  typedef std::function<void(evutil_socket_t, short)> conn_cb;
+  typedef std::function<void(evutil_socket_t, void*)> read_cb;
+  typedef std::function<void(evutil_socket_t, void*)> write_cb;
+  typedef std::function<void(evutil_socket_t, short, void*)> error_cb;
+  typedef std::function<void(evutil_socket_t, struct sockaddr_in*, void*)> accept_cb;
+#endif /* C_CALL */
 
 struct client_user_init{
   read_cb _read_cb;
@@ -57,7 +52,7 @@ struct server_user_init{
   read_cb _read_cb;
   write_cb _write_cb;
   accept_cb _accept_cb;
-  event_cb _error_cb;
+  error_cb _error_cb;
 };
 
 struct server_system_init{
@@ -74,22 +69,7 @@ struct service_init{
   struct server_system_init ssi;
 };
 
-/* open & close socket */
-LEO_EXPORT evutil_socket_t net_socket_open();
-LEO_EXPORT void net_socket_close(evutil_socket_t fd);
-LEO_EXPORT int net_socket_init(evutil_socket_t fd);
-
-LEO_EXPORT int net_socket_bind(evutil_socket_t fd, short port);
-LEO_EXPORT int net_socket_listen(evutil_socket_t fd, int backlog);
- 
-/* read & write on socket */
-LEO_EXPORT int net_socket_recv(evutil_socket_t fd, void* buf, ev_ssize_t len);
-LEO_EXPORT int net_socket_send(evutil_socket_t fd, const void* buf, ev_ssize_t len);
- 
-/* socket settings */
-LEO_EXPORT int net_socket_tcpnodely(evutil_socket_t fd);
-LEO_EXPORT int net_socket_reuseaddr(evutil_socket_t fd);
-LEO_EXPORT int net_socket_nonblocking(evutil_socket_t fd);
+typedef void(* event_cb)(evutil_socket_t, short, void*);
 
 /* about events */
 LEO_EXPORT struct event* net_event_create(struct event_base* eb, evutil_socket_t fd, short events, event_cb cb, void* arg);
