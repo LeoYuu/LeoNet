@@ -1,43 +1,11 @@
+#include <functional>
 #include "loginserver.h"
 #include "leo_net_service.h"
-
-login_server g_loginserver;
 
 static ev_ssize_t 
 pre_read(struct evbuffer* rb, void* buf, size_t len)
 {
   return evbuffer_copyout(rb, buf, len);
-}
-
-void* 
-thread_proc(void* args) 
-{
-  g_loginserver.thread_network(args);
-  return 0;
-}
-
-void 
-on_accept(evutil_socket_t fd, struct sockaddr_in* sin, void* args) 
-{
-  g_loginserver.on_loginserver_accept(fd, sin, args);
-}
-
-void 
-on_read(evutil_socket_t fd, void* args)
-{
-  g_loginserver.on_loginserver_read(fd, args);
-}
-
-void 
-on_write(evutil_socket_t fd, void* args)
-{
-  g_loginserver.on_loginserver_write(fd, args);
-}
-
-void 
-on_error(evutil_socket_t fd, short error, void* args) 
-{
-  g_loginserver.on_loginserver_error(fd, error, args);
 }
 
 login_server::login_server()
@@ -51,7 +19,7 @@ login_server::~login_server()
 void 
 login_server::start_network()
 {
-  pthread_create(&__thread_id, 0, thread_proc, 0);
+  __thread = std::thread(std::bind(&login_server::thread_network, this, std::placeholders::_1), 0);
 }
 
 void 
@@ -68,10 +36,10 @@ login_server::thread_network(void* args)
 
   __si.ssi._port = PORT;
   __si.ssi._backlog = BACKLOG;
-  __si.sui._accept_cb = on_accept;
-  __si.sui._read_cb = on_read;
-  __si.sui._write_cb = on_write;
-  __si.sui._error_cb = on_error;
+  __si.sui._accept_cb = std::bind(&login_server::on_loginserver_accept, this, std::placeholders::_1, std::placeholders::_2);
+  __si.sui._read_cb = std::bind(&login_server::on_loginserver_accept, this, std::placeholders::_1);
+  __si.sui._write_cb = std::bind(&login_server::on_loginserver_accept, this, std::placeholders::_1);
+  __si.sui._error_cb = std::bind(&login_server::on_loginserver_accept, this, std::placeholders::_1, std::placeholders::_2);
 
   __si.eb = net_core_create();
   if(0 == __si.eb) {

@@ -30,7 +30,10 @@ public:
 
   inline static t* instance()
   { 
-    assert(__instance); 
+    if (!__instance)
+    {
+      __instance = create_singleton();
+    }
     return __instance; 
   }
 
@@ -39,6 +42,6 @@ protected:
 };
 
 template <typename t>
-t* leo_singleton<t>::__instance = NULL;
+t* leo_singleton<t>::__instance = nullptr;
 
 #endif /* __LEO_SINGLETON_H__ */

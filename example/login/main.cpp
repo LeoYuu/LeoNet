@@ -13,10 +13,10 @@ int
 main(int argc, char* argv[])
 {
   sig_handler();
-
-  g_loginserver.start_loginserver();
-
-  g_loginserver.main_loop();
+ 
+  login_server::instance()->start_loginserver();
+  
+  login_server::instance()->main_loop();
 
   return 0;
 }

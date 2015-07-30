@@ -1,7 +1,7 @@
 #ifndef __LEO_LOGINSERVER_H__
 #define __LEO_LOGINSERVER_H__
 
-#include <pthread.h>
+#include <thread>
 
 #include "leo_singleton.h"
 #include "leo_net_service.h"
@@ -11,15 +11,15 @@
 #define PORT 1200
 #define BACKLOG 100
 
-class login_server
+class login_server : public leo_singleton<login_server>
 {
 public:
   login_server();
   ~login_server();
 
 public:
-  bool load_ini_config();
-  bool load_xml_config();
+  /*bool load_ini_config();
+  bool load_xml_config();*/
 
 public:
   void start_network();
@@ -37,10 +37,8 @@ public:
 
 private:
   service_init __si;
-  pthread_t __thread_id;
+  std::thread __thread;
   session_manager __session_manager;
 };
-
-extern login_server g_loginserver;
 
 #endif /* __LEO_LOGINSERVER_H__ */
