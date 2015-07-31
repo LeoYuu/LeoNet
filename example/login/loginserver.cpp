@@ -19,7 +19,16 @@ login_server::~login_server()
 void 
 login_server::start_network()
 {
-  __thread = std::thread(std::bind(&login_server::thread_network, this, std::placeholders::_1), 0);
+  service_init __si;
+  __si.ssi._port = PORT;
+  __si.ssi._backlog = BACKLOG;
+  __si.sui._accept_cb = std::bind(&TcpServer::OnAccept, &__tcp_server, std::placeholders::_1, std::placeholders::_2);
+  __si.sui._read_cb = std::bind(&TcpServer::OnRead, &__tcp_server, std::placeholders::_1);
+  __si.sui._write_cb = std::bind(&TcpServer::OnWrite, &__tcp_server, std::placeholders::_1);
+  __si.sui._error_cb = std::bind(&TcpServer::OnError, &__tcp_server, std::placeholders::_1, std::placeholders::_2);
+
+  __tcp_server.Init(__si);
+  __tcp_server.Start();
 }
 
 void 

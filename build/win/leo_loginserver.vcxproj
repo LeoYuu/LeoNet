@@ -94,11 +94,15 @@
     <ClCompile Include="..\..\example\login\main.cpp" />
     <ClCompile Include="..\..\example\login\recv_message.cpp" />
     <ClCompile Include="..\..\example\login\server_session.cpp" />
+    <ClCompile Include="..\..\src\TcpConnection.cpp" />
+    <ClCompile Include="..\..\src\TcpServer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\example\login\loginserver.h" />
     <ClInclude Include="..\..\example\login\message_define.h" />
     <ClInclude Include="..\..\example\login\server_session.h" />
+    <ClInclude Include="..\..\src\TcpConnection.h" />
+    <ClInclude Include="..\..\src\TcpServer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -3,10 +3,8 @@
 
 #include <thread>
 
+#include "TcpServer.h"
 #include "leo_singleton.h"
-#include "leo_net_service.h"
-#include "leo_tcp_game_protocol.h"
-#include "server_session.h"
 
 #define PORT 1200
 #define BACKLOG 100
@@ -29,15 +27,8 @@ public:
   void main_loop();
   void thread_network(void* args);
 
-public:
-  void on_loginserver_read(evutil_socket_t fd, void* args);
-  void on_loginserver_write(evutil_socket_t fd, void* args);
-  void on_loginserver_error(evutil_socket_t fd, short error, void* args);
-  void on_loginserver_accept(evutil_socket_t fd, struct sockaddr_in* sin, void* args);
-
 private:
-  service_init __si;
-  std::thread __thread;
+  TcpServer __tcp_server;
   session_manager __session_manager;
 };
 

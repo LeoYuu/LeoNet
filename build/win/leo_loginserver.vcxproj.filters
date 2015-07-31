@@ -23,6 +23,12 @@
     <ClCompile Include="..\..\example\login\server_session.cpp">
       <Filter>source files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\TcpServer.cpp">
+      <Filter>source files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\TcpConnection.cpp">
+      <Filter>source files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\example\login\loginserver.h">
@@ -32,6 +38,12 @@
       <Filter>include files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\example\login\server_session.h">
+      <Filter>include files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\TcpServer.h">
+      <Filter>include files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\TcpConnection.h">
       <Filter>include files</Filter>
     </ClInclude>
   </ItemGroup>
