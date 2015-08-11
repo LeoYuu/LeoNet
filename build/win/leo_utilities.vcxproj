@@ -95,6 +95,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\leo_lock_free_queue.h" />
     <ClInclude Include="..\..\src\leo_marco_util.h" />
+    <ClInclude Include="..\..\src\leo_net_address.h" />
     <ClInclude Include="..\..\src\leo_singleton.h" />
     <ClInclude Include="..\..\src\leo_utilities.h" />
     <ClInclude Include="..\..\src\ring_buffer.h" />

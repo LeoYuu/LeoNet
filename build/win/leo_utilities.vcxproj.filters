@@ -31,5 +31,8 @@
     <ClInclude Include="..\..\src\ring_buffer.h">
       <Filter>include files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\leo_net_address.h">
+      <Filter>include files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

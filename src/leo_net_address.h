@@ -10,7 +10,9 @@
 # include <netinet/in.h>
 #endif
 
-class NetAddress
+#include "leo_utilities.h"
+
+class LEO_EXPORT NetAddress
 {
 public:
   NetAddress(std::string ip, unsigned short port)
@@ -25,7 +27,10 @@ public:
     : addr_(addr)
   {
 
-  }
+  } 
+
+  /*NetAddress(NetAddress&&) = delete;
+  NetAddress(const NetAddress&) = delete;*/
 
 public:
   unsigned short toPort() const
